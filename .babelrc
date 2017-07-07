@@ -1,0 +1,23 @@
+{
+  "presets": [
+    "next/babel",
+    "env",
+    "stage-1"
+  ],
+  "plugins": [
+    "dynamic-import-node",
+    "transform-decorators-legacy",
+    [ "module-resolver",
+      {
+        "root": [
+          "./src/client",
+          "./src/server",
+          "./src/common"
+        ]
+      }
+    ]
+  ],
+  "ignore": [
+    "node_modules"
+  ]
+}
