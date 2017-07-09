@@ -45,7 +45,7 @@ app.prepare()
       return handle(req, res);
     });
 
-    server.listen(3000, (err) => {
+    server.listen(8050, (err) => {
       if (err) {
         throw err;
       }
