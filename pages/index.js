@@ -1,26 +1,30 @@
-import Link from 'next/link';
-
+import { Component } from 'react';
 import Layout from 'components/Layout';
+import MapManager from 'helpers/MapManager';
+import clientEntry from 'helpers/clientEntry';
 
-export default () => (
-  <div>
-    <Layout htmlTitle={'Home'}>
-      <br />
-      <Link href="/login" >
-        <a>Login</a>
-      </Link>
-      <br />
-      <Link href="/signup" >
-        <a>Signup</a>
-      </Link>
-      <div className="content">content</div>
-      <br /><br /><br /><br /><br /><br />
-      <div className="content">content</div>
-      <br /><br /><br /><br /><br /><br />
-      <div className="content">content</div>
-      <br /><br /><br /><br /><br /><br />
-      <div className="content">content</div>
-      <br /><br /><br /><br /><br /><br />
-    </Layout>
-  </div>
-);
+@clientEntry
+class HomePage extends Component {
+  componentDidMount() {
+    MapManager.insertMapToDom(document.querySelector('#mapRegion'));
+  }
+
+  render() {
+    return (
+      <div>
+        <Layout htmlTitle={'Home'}>
+          <div id="mapRegion" className="mapRegion">
+          </div>
+        </Layout>
+        <style jsx>{`
+          #mapRegion {
+            height: 100%;
+            background: grey;
+          }
+        `}</style>
+      </div>
+    );
+  }
+}
+
+export default HomePage;

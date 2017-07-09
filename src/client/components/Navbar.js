@@ -4,6 +4,7 @@ import {
 } from 'constants';
 
 const Navbar = () => {
+  console.log('render Navbar');
   return (
     <div className="navbar" >
 

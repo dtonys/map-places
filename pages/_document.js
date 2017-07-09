@@ -1,4 +1,3 @@
-// ./pages/_document.js
 import Document, { Head, Main, NextScript } from 'next/document';
 import flush from 'styled-jsx/server'; // eslint-disable-line import/no-extraneous-dependencies
 

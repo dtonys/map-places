@@ -1,5 +1,28 @@
+import path from 'path';
+
 import express from 'express';
 import next from 'next';
+import dotenv from 'dotenv';
+
+// Load dotenv
+let envs = null;
+try {
+  envs = dotenv.load({ path: path.resolve(__dirname, '../../.env') });
+}
+catch (ex) {
+  console.error('Failed to read .env file:', ex); // eslint-disable-line no-console
+}
+
+// Set global flags to detect server vs client in React components
+const globals = Object.assign({}, envs.parsed, {
+  __SERVER__: true,
+  __CLIENT__: false,
+});
+
+// Attach to nodejs global object
+if ( envs && envs.parsed ) {
+  Object.assign( global, globals );
+}
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
