@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development babel-watch -D --delay 5 -w ./src/common -w ./src/server ./src/server/server.js",
     "build": "cross-env NODE_ENV=production next build",
-    "start": "cross-env NODE_ENV=production node ./bin/run-server.js",
+    "start": "cross-env NODE_ENV=production forever start --uid map-places --append ./bin/run-server.js",
     "lint-js": "eslint -c ./.eslintrc.js ./bin ./pages ./src"
   },
   "dependencies": {
