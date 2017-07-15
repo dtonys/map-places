@@ -1,4 +1,4 @@
-# map-places
+# MapPlaces
 
 MapPlaces is a generic, map based webapp.
 
