@@ -4,16 +4,11 @@ import {
 } from 'domUtils';
 
 const MapManager = {
+  /** Private members **/
   mapDomNode: null,
   googleMap: null,
+  googleMapMarkers: {},
   initializeComplete: null,
-  initialize: function () { // eslint-disable-line func-names
-    this.createMapDomNode();
-    this.initializeComplete = this.loadGoogleMapsScript()
-      .then(() => {
-        this.createGoogleMap();
-      });
-  },
   createMapDomNode: function () { // eslint-disable-line func-names
     if ( this.mapDomNode ) return;
     this.mapDomNode = document.createElement('div');
@@ -40,11 +35,32 @@ const MapManager = {
       zoom: 11,
     });
   },
+  /** Public members **/
+  initialize: function () { // eslint-disable-line func-names
+    this.createMapDomNode();
+    this.initializeComplete = this.loadGoogleMapsScript()
+      .then(() => {
+        this.createGoogleMap();
+      });
+  },
   insertMapToDom: async function insertMapToDom( containerDomNode ) {
     await this.initializeComplete;
     containerDomNode.appendChild(this.mapDomNode);
     // NOTE: Trigger a resize to make the map appear
     google.maps.event.trigger(this.googleMap, 'resize'); // eslint-disable-line
+    return true;
+  },
+  attachMarkerToMap: async function attachMarkerToMap({ lat, lng }) {
+    await this.initializeComplete;
+    const latLngUID = `${lat}_${lng}`;
+    if ( this.googleMapMarkers[latLngUID] ) {
+      return false;
+    }
+    const marker = new google.maps.Marker({
+      position: { lat, lng },
+      map: this.googleMap,
+    });
+    this.googleMapMarkers[latLngUID] = marker;
     return true;
   },
 };

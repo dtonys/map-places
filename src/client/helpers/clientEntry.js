@@ -1,7 +1,6 @@
 // NOTE: Next.js does not have a standard client side entry point.
 // This HOC allows one time client side scripts to be run, it must be applied to
 // all page components in the /pages directory.
-// See https://medium.com/@franleplant/react-higher-order-components-in-depth-cf9032ee6c3e
 import { Component } from 'react';
 import MapManager from 'helpers/MapManager';
 import { wrapDisplayName } from 'recompose';

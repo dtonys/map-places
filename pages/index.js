@@ -7,6 +7,10 @@ import clientEntry from 'helpers/clientEntry';
 class HomePage extends Component {
   componentDidMount() {
     MapManager.insertMapToDom(document.querySelector('#mapRegion'));
+    MapManager.attachMarkerToMap({
+      lat: 37.66,
+      lng: -122.47,
+    });
   }
 
   render() {
