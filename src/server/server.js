@@ -1,6 +1,7 @@
 import path from 'path';
 
 import express from 'express';
+import favicon from 'serve-favicon';
 import next from 'next';
 import dotenv from 'dotenv';
 
@@ -25,12 +26,14 @@ if ( envs && envs.parsed ) {
 }
 
 const dev = process.env.NODE_ENV !== 'production';
+
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
 app.prepare()
   .then(() => {
     const server = express();
+    server.use(favicon(path.resolve(__dirname, '../../static/favicon.ico')));
 
     // NOTE: Add custom route handling logic here
     // server.get('/a', (req, res) => {
