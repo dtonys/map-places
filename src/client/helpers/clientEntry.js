@@ -8,7 +8,12 @@ import { wrapDisplayName } from 'recompose';
 let clientEntryRun = false;
 // NOTE: Perform client side initialization here.  This is run once on page load.
 function clientEntry() {
-  MapManager.initialize();
+  MapManager.initialize({
+    initialCenterLatLng: {
+      lat: 37.549854,
+      lng: -122.291353,
+    },
+  });
 }
 
 function ClientEntryHOCCreator( WrappedComponent ) {

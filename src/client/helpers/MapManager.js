@@ -4,11 +4,13 @@ import {
 } from 'domUtils';
 
 const MapManager = {
-  /** Private members **/
+
   mapDomNode: null,
   googleMap: null,
   googleMapMarkers: {},
   initializeComplete: null,
+
+  /** Private **/
   createMapDomNode: function () { // eslint-disable-line func-names
     if ( this.mapDomNode ) return;
     this.mapDomNode = document.createElement('div');
@@ -25,22 +27,20 @@ const MapManager = {
       appendScriptToHead(`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap`);
     });
   },
-  createGoogleMap: function () { // eslint-disable-line func-names
+  createGoogleMap: function ({ lat, lng }) { // eslint-disable-line func-names
     if ( this.googleMap ) return;
     this.googleMap = new google.maps.Map(this.mapDomNode, { // eslint-disable-line
-      center: {
-        lat: 37.66,
-        lng: -122.47,
-      },
+      center: { lat, lng },
       zoom: 11,
     });
   },
-  /** Public members **/
-  initialize: function () { // eslint-disable-line func-names
+
+  /** Public **/
+  initialize: function ({ initialCenterLatLng }) { // eslint-disable-line func-names
     this.createMapDomNode();
     this.initializeComplete = this.loadGoogleMapsScript()
       .then(() => {
-        this.createGoogleMap();
+        this.createGoogleMap( initialCenterLatLng );
       });
   },
   insertMapToDom: async function insertMapToDom( containerDomNode ) {
