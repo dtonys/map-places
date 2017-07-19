@@ -1,11 +1,28 @@
 import { Component } from 'react';
+
 import Layout from 'components/Layout';
 import clientEntry from 'helpers/clientEntry';
+import attachRedux from 'helpers/attachRedux';
 
 const mockSubmit = (event) => { event.preventDefault(); };
 
-@clientEntry
+@clientEntry()
+@attachRedux()
 class LoginPage extends Component {
+
+  static async getInitialProps() {
+    return { whatever: 'whatever' };
+  }
+
+  componentWillReceiveProps() {
+  }
+
+  componentWillMount() {
+  }
+
+  componentDidMount() {
+  }
+
   render() {
     return (
       <div>

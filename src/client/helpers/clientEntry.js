@@ -1,13 +1,14 @@
-// NOTE: Next.js does not have a standard client side entry point.
-// This HOC allows one time client side scripts to be run, it must be applied to
-// all page components in the /pages directory.
+// HOC for client side entry
 import { Component } from 'react';
-import MapManager from 'helpers/MapManager';
 import { wrapDisplayName } from 'recompose';
 
+import MapManager from 'helpers/MapManager';
+
+
 let clientEntryRun = false;
-// NOTE: Perform client side initialization here.  This is run once on page load.
+// NOTE: Perform client side initialization here.  This is run once only.
 function clientEntry() {
+  console.log('clientEntry::start');
   MapManager.initialize({
     initialCenterLatLng: {
       lat: 37.549854,
@@ -16,20 +17,52 @@ function clientEntry() {
   });
 }
 
-function ClientEntryHOCCreator( WrappedComponent ) {
-  class ClientEntryHOC extends Component {
-    constructor( props ) {
-      if ( __CLIENT__ && !clientEntryRun ) {
-        clientEntry();
-        clientEntryRun = true;
+
+function ClientEntryWithArgs(/* args */) {
+
+  function ClientEntry( WrappedComponent ) {
+
+    class ClientEntryHOC extends Component {
+      static async getInitialProps( nextJSContext ) {
+        const clientEntryFetched = await new Promise(( resolve ) => {
+          setTimeout( resolve.bind( null, true ), 100);
+        });
+
+        let wrappedComponentInitialProps = {};
+        if ( WrappedComponent.getInitialProps ) {
+          wrappedComponentInitialProps = await WrappedComponent.getInitialProps(nextJSContext);
+        }
+        return {
+          clientEntryFetched,
+          ...wrappedComponentInitialProps,
+        };
       }
-      super(props);
+
+      constructor(props) {
+        super(props);
+        this.state = {
+          clientEntry: false,
+        };
+        // Run client entry, once
+        if ( __CLIENT__ ) {
+          if ( !clientEntryRun ) {
+            clientEntry();
+            clientEntryRun = true;
+            this.state.clientEntry = true;
+          }
+        }
+      }
+
+      render() {
+        const { clientEntry } = this.state;
+        return <WrappedComponent {...this.props} clientEntry={clientEntry} />;
+      }
     }
-    render() {
-      return <WrappedComponent {...this.props} />;
-    }
+
+    ClientEntryHOC.displayName = wrapDisplayName( WrappedComponent, 'ClientEntryHOC' );
+    return ClientEntryHOC;
   }
-  ClientEntryHOC.displayName = wrapDisplayName( WrappedComponent, 'clientEntry' );
-  return ClientEntryHOC;
+  return ClientEntry;
 }
-export default ClientEntryHOCCreator;
+
+export default ClientEntryWithArgs;

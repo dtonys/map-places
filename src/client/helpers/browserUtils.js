@@ -1,20 +1,22 @@
-export function tryGetCurrentPosition( onSuccess, onFail ) {
-  // HTML5 geolocation
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((position) => {
-      onSuccess({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
+export function tryGetCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    // HTML5 geolocation
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      }, () => {
+        console.log('geolocation.getCurrentPosition failed.'); // eslint-disable-line no-console
+        reject();
       });
-    }, () => {
-      onFail();
-      console.log('geolocation.getCurrentPosition failed.'); // eslint-disable-line no-console
-    });
-  }
-  else {
-    onFail();
-    console.log('Browser doesn\'t support Geolocation.'); // eslint-disable-line no-console
-  }
+    }
+    else {
+      console.log('Browser doesn\'t support Geolocation.'); // eslint-disable-line no-console
+      reject();
+    }
+  });
 }
 
 export function placeHolder() { }
