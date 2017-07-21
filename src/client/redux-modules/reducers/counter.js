@@ -3,6 +3,9 @@ import {
   ACTION_DECREMENT_COUNTER,
 } from 'redux-modules/actions/counter';
 
+import {
+  execute,
+} from 'helpers/reduxAction';
 
 export const STORE_KEY = 'counter';
 
@@ -17,11 +20,11 @@ export function extractState(globalState) {
 // Reducer
 function reducer( state = initialState, action ) {
   switch ( action.type ) {
-    case ACTION_INCREMENT_COUNTER: {
+    case execute(ACTION_INCREMENT_COUNTER): {
       return state + 1;
     }
 
-    case ACTION_DECREMENT_COUNTER: {
+    case execute(ACTION_DECREMENT_COUNTER): {
       return state - 1;
     }
 

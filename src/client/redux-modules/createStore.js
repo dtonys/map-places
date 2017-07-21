@@ -3,7 +3,9 @@ import {
   applyMiddleware,
 } from 'redux';
 import { createLogger } from 'redux-logger';
+import createSagaMiddleware from 'redux-saga';
 import rootReducer from 'redux-modules/rootReducer';
+import rootSaga from 'redux-modules/rootSaga';
 
 function createStore( initialState ) {
   const middleware = [];
@@ -148,11 +150,16 @@ function createStore( initialState ) {
     middleware.push( createLogger(reduxLoggerOptions) );
   }
 
+  // saga
+  const sagaMiddleware = createSagaMiddleware();
+  middleware.push( sagaMiddleware );
   const store = reduxCreateStore(
     rootReducer,
     initialState,
     applyMiddleware( ...middleware ),
   );
+  sagaMiddleware.run(rootSaga);
+
   return store;
 }
 

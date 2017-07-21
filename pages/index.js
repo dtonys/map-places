@@ -15,10 +15,14 @@ import {
   tryGetCurrentPosition,
 } from 'helpers/browserUtils';
 
-import makeAction from 'helpers/reduxAction';
+import makeAction, {
+  request,
+  execute,
+} from 'helpers/reduxAction';
 import {
   ACTION_INCREMENT_COUNTER,
   ACTION_DECREMENT_COUNTER,
+  ACTION_INCREMENT_COUNTER_ASYNC,
 } from 'redux-modules/actions/counter';
 
 
@@ -205,12 +209,23 @@ class HomePage extends Component {
     MapManager.googleMap.setCenter(this.state.currentPositionLatLng);
   }
 
+  incrementCounterAsync = () => {
+    this.props.dispatch( makeAction(
+      request(ACTION_INCREMENT_COUNTER_ASYNC),
+      { delayMs: 2000 }
+    ) );
+  }
+
   incrementCounter = () => {
-    this.props.dispatch( makeAction(ACTION_INCREMENT_COUNTER) );
+    this.props.dispatch( makeAction(
+      execute(ACTION_INCREMENT_COUNTER)
+    ) );
   }
 
   decrementCounter = () => {
-    this.props.dispatch( makeAction(ACTION_DECREMENT_COUNTER) );
+    this.props.dispatch( makeAction(
+      execute(ACTION_DECREMENT_COUNTER)
+    ) );
   }
 
   render() {
@@ -227,6 +242,9 @@ class HomePage extends Component {
           {/* <div>{JSON.stringify(this.props)}</div> */}
           <MapDevTool />
           <div>{`Redux Counter: ${counterValue}`}</div>
+          <button onClick={this.incrementCounterAsync} >
+            {'incrementCounterAsyc'}
+          </button>
           <button onClick={this.incrementCounter} >
             {'Redux Inc Counter'}
           </button>

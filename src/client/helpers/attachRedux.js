@@ -4,7 +4,9 @@ import { wrapDisplayName } from 'recompose';
 import { Provider as ReduxStoreProvider } from 'react-redux';
 
 import createStore from 'redux-modules/createStore';
-import makeAction from 'helpers/reduxAction';
+import makeAction, {
+  execute,
+} from 'helpers/reduxAction';
 
 import {
   ACTION_INCREMENT_COUNTER,
@@ -26,7 +28,9 @@ function AttachReduxWithArgs(/* args */) {
 
         if ( __SERVER__ ) {
           serverStore = createStore();
-          serverStore.dispatch( makeAction(ACTION_INCREMENT_COUNTER) );
+          serverStore.dispatch( makeAction(
+            execute(ACTION_INCREMENT_COUNTER)
+          ) );
           serverStoreInitialState = serverStore.getState();
         }
         let wrappedComponentInitialProps = {};
