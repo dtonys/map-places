@@ -18,6 +18,7 @@ catch (ex) {
 const globals = Object.assign({}, envs.parsed, {
   __SERVER__: true,
   __CLIENT__: false,
+  __DEVELOPMENT__: !(process.env.NODE_ENV === 'production'),
 });
 
 // Attach to nodejs global object

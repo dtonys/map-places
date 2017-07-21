@@ -19,6 +19,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-1": "^6.24.1",
     "babel-register": "^6.24.1",
+    "chalk": "^2.0.1",
     "cross-env": "^5.0.1",
     "dotenv": "^4.0.0",
     "express": "^4.15.3",
@@ -45,6 +46,8 @@
     "eslint-import-resolver-webpack": "^0.8.3",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
-    "eslint-plugin-react": "^7.1.0"
+    "eslint-plugin-react": "^7.1.0",
+    "redux-logger": "^3.0.6",
+    "redux-node-logger": "^0.1.0"
   }
 }

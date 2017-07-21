@@ -47,7 +47,7 @@ module.exports = {
     // The `comma-dangle` helps to keep version control clean if array or object items are added or removed - only the lines that are actually changed will be highlighted.
     "comma-dangle": [ "warn", "always-multiline" ],
     "space-in-parens": "off",
-    // TODO(@sompylasar): Re-enable `curly` and fix.
+    // TODO: Re-enable `curly` and fix.
     "curly": [ "off", "all" ],
     "array-bracket-spacing": [ "warn", "always" ],
     "object-curly-spacing": [ "warn", "always" ],
@@ -73,18 +73,17 @@ module.exports = {
     "arrow-body-style": "off",
     "object-shorthand": "off",
     "no-case-declarations": "warn",
-    // Disable `no-nested-ternary` because we use them sometimes. Please do not over-use, consider readability. -- @sompylasar
     "no-nested-ternary": "off",
     "global-require": "off",
     "no-underscore-dangle": "off",
     "no-useless-concat": "off",
     "no-mixed-operators": "off",
-    // NOTE(@sompylasar): Keep bitwise, @dtonys uses unary negation `~` for `indexOf`.
+    // NOTE: Keep bitwise, can use unary negation `~` for `indexOf`.
     "no-bitwise": "off",
     "no-plusplus": "off",
     "no-continue": "off",
     "newline-per-chained-call": "off",
-    // WORKAROUND(@sompylasar): airbnb disallows `for..of` https://github.com/airbnb/javascript/issues/1122#issuecomment-266219071 https://github.com/flying-sheep/eslint-config/blob/v2.0.1/defaults.js#L22
+    // WORKAROUND: airbnb disallows `for..of` https://github.com/airbnb/javascript/issues/1122#issuecomment-266219071 https://github.com/flying-sheep/eslint-config/blob/v2.0.1/defaults.js#L22
     "no-restricted-syntax": [
       "error",
       "ForInStatement",
@@ -98,13 +97,13 @@ module.exports = {
     //
     "react/prop-types": "warn",
     "react/require-default-props": "off",
-    // TODO(@sompylasar): Re-enable `react/forbid-prop-types` and fix vague proptypes such as `PropTypes.object` and `PropTypes.array`.
+    // TODO: Re-enable `react/forbid-prop-types` and fix vague proptypes such as `PropTypes.object` and `PropTypes.array`.
     "react/forbid-prop-types": "off",
-    // TODO(@sompylasar): Re-enable `react/forbid-foreign-prop-types` and properly import proptypes from components.
+    // TODO: Re-enable `react/forbid-foreign-prop-types` and properly import proptypes from components.
     "react/forbid-foreign-prop-types": "off",
-    // TODO(@sompylasar): Re-enable `react/forbid-component-props` and remove `className` and `style` from components.
+    // TODO: Re-enable `react/forbid-component-props` and remove `className` and `style` from components.
     "react/forbid-component-props": [ "off", { "forbid": [ "className", "style" ] } ],
-    // NOTE(@sompylasar): The `react/no-unused-prop-types` rule does not work properly. @see https://github.com/yannickcr/eslint-plugin-react/issues/816
+    // NOTE: The `react/no-unused-prop-types` rule does not work properly. @see https://github.com/yannickcr/eslint-plugin-react/issues/816
     "react/no-unused-prop-types": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": [ "warn", { "extensions": [ ".js", ".jsx" ] } ],
@@ -112,18 +111,18 @@ module.exports = {
     "react/jsx-uses-vars": "error",
     "react/jsx-quotes": "off",
     "react/jsx-first-prop-new-line": "off",
-    // NOTE(@sompylasar): The `react/jsx-closing-bracket-location` rule does not work properly; should use `line-aligned` when it gets fixed; no GitHub issue yet.
-    // TODO(@sompylasar): Make a GitHub issue for the `react/jsx-closing-bracket-location` rule's `line-aligned` malfunction.
+    // NOTE: The `react/jsx-closing-bracket-location` rule does not work properly; should use `line-aligned` when it gets fixed; no GitHub issue yet.
+    // TODO: Make a GitHub issue for the `react/jsx-closing-bracket-location` rule's `line-aligned` malfunction.
     "react/jsx-closing-bracket-location": "off",
     "react/jsx-tag-spacing": "warn",
     "react/jsx-curly-spacing": "off",
-    // NOTE(@sompylasar): Unfortunately, `react/jsx-indent` does not understand indent in parens in ternary. @see https://github.com/yannickcr/eslint-plugin-react/issues/454
+    // NOTE: Unfortunately, `react/jsx-indent` does not understand indent in parens in ternary. @see https://github.com/yannickcr/eslint-plugin-react/issues/454
     "react/jsx-indent": "off",
     "react/self-closing-comp": [ "warn", { "component": true, "html": false } ],
     "react/no-multi-comp": "off",
     "react/sort-comp": "off",
     "react/prefer-stateless-function": "warn",
-    // NOTE(@sompylasar): The `react/no-children-prop` crashes. The fix hasn't been released as of now. @see https://github.com/yannickcr/eslint-plugin-react/commit/f227eb4e536426773c71674502958f0f96b75040
+    // NOTE: The `react/no-children-prop` crashes. The fix hasn't been released as of now. @see https://github.com/yannickcr/eslint-plugin-react/commit/f227eb4e536426773c71674502958f0f96b75040
     "react/no-children-prop": "off",
     "react/no-danger-with-children": "error",
 
@@ -175,6 +174,7 @@ module.exports = {
     "GOOGLE_MAPS_API_KEY": true,
     "__CLIENT__": true,
     "__SERVER__": true,
+    "__DEVELOPMENT__": true,
     "google": true,
   },
 };
