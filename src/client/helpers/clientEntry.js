@@ -54,8 +54,7 @@ function ClientEntryWithArgs(/* args */) {
       }
 
       render() {
-        const { clientEntry } = this.state;
-        return <WrappedComponent {...this.props} clientEntry={clientEntry} />;
+        return <WrappedComponent {...this.props} />;
       }
     }
 

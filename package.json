@@ -7,7 +7,8 @@
     "dev": "cross-env NODE_ENV=development babel-watch -D --delay 5 -w ./src/common -w ./src/server ./src/server/server.js",
     "build": "cross-env NODE_ENV=production next build",
     "start": "cross-env NODE_ENV=production forever start --uid map-places --append ./bin/run-server.js",
-    "lint-js": "eslint -c ./.eslintrc.js ./bin ./pages ./src"
+    "lint-js": "eslint -c ./.eslintrc.js ./bin ./pages ./src",
+    "analyze": "cross-env ANALYZE=1 next build"
   },
   "dependencies": {
     "babel-loader": "^7.1.1",
@@ -25,7 +26,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.15.3",
     "lodash": "^4.17.4",
-    "next": "^3.0.1-beta.5",
+    "next": "^2.4.7",
     "npm-run-all": "^4.0.2",
     "postcss-loader": "^2.0.6",
     "prop-types": "^15.5.10",
@@ -38,12 +39,13 @@
     "redux-saga": "^0.15.4",
     "serve-favicon": "^2.4.3",
     "superagent": "^3.5.2",
-    "webpack": "^3.1.0"
+    "webpack": "^3.1.0",
+    "webpack-bundle-analyzer": "^2.8.3"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
     "babel-watch": "^2.0.6",
-    "eslint": "^4.1.1",
+    "eslint": "^4.3.0",
     "eslint-config-airbnb": "^15.0.2",
     "eslint-import-resolver-node": "^0.3.1",
     "eslint-import-resolver-webpack": "^0.8.3",

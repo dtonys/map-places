@@ -24,10 +24,10 @@ function AttachReduxWithArgs(/* args */) {
         serverStoreInitialState: PropTypes.object,
       }
 
-      static async getInitialProps( nextJSContext ) {
+      static async getInitialProps( context ) {
 
         if ( __SERVER__ ) {
-          const { res } = nextJSContext;
+          const { res } = context;
           serverStore = createStore();
           serverStore.dispatch( makeAction(
             execute(ACTION_INCREMENT_COUNTER)
@@ -38,7 +38,7 @@ function AttachReduxWithArgs(/* args */) {
         }
         let wrappedComponentInitialProps = {};
         if ( WrappedComponent.getInitialProps ) {
-          wrappedComponentInitialProps = await WrappedComponent.getInitialProps(nextJSContext);
+          wrappedComponentInitialProps = await WrappedComponent.getInitialProps(context);
         }
         return {
           ...wrappedComponentInitialProps,
@@ -50,8 +50,6 @@ function AttachReduxWithArgs(/* args */) {
         super(props);
         if ( __CLIENT__ ) {
           if ( !clientStore ) {
-            console.log('JSON.stringify(serverStoreInitialState)');
-            console.log(JSON.stringify( props.serverStoreInitialState ));
             clientStore = createStore( props.serverStoreInitialState );
             window.store = clientStore;
           }
