@@ -186,6 +186,9 @@ class HomePage extends Component {
           });
         });
     }
+    else {
+      MapManager.insertMapToDom(document.querySelector('#mapRegion'));
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {

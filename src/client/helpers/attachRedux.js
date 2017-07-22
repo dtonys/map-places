@@ -50,6 +50,8 @@ function AttachReduxWithArgs(/* args */) {
         super(props);
         if ( __CLIENT__ ) {
           if ( !clientStore ) {
+            console.log('JSON.stringify(serverStoreInitialState)');
+            console.log(JSON.stringify( props.serverStoreInitialState ));
             clientStore = createStore( props.serverStoreInitialState );
             window.store = clientStore;
           }
