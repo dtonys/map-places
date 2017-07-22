@@ -5,6 +5,8 @@ import favicon from 'serve-favicon';
 import next from 'next';
 import dotenv from 'dotenv';
 
+import api from 'api';
+
 // Load dotenv
 let envs = null;
 try {
@@ -35,6 +37,9 @@ app.prepare()
   .then(() => {
     const server = express();
     server.use(favicon(path.resolve(__dirname, '../../static/favicon.ico')));
+
+    // API server
+    server.use('/api', api);
 
     // NOTE: Add custom route handling logic here
     // server.get('/a', (req, res) => {

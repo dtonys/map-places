@@ -5,7 +5,6 @@
     "stage-1"
   ],
   "plugins": [
-    "dynamic-import-node",
     "transform-decorators-legacy",
     [ "module-resolver",
       {

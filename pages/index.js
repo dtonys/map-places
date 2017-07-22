@@ -24,7 +24,10 @@ import {
   ACTION_DECREMENT_COUNTER,
   ACTION_INCREMENT_COUNTER_ASYNC,
 } from 'redux-modules/actions/counter';
-
+import {
+  ACTION_LOAD_USER,
+  ACTION_LOAD_PAGE,
+} from 'redux-modules/actions/user';
 
 class MapDevTool extends Component {
   constructor(props) {
@@ -228,6 +231,18 @@ class HomePage extends Component {
     ) );
   }
 
+  loadUserData = () => {
+    this.props.dispatch( makeAction(
+      request(ACTION_LOAD_USER)
+    ) );
+  }
+
+  loadPageData = () => {
+    this.props.dispatch( makeAction(
+      request(ACTION_LOAD_PAGE)
+    ) );
+  };
+
   render() {
     const {
       currentPositionLatLng,
@@ -242,6 +257,12 @@ class HomePage extends Component {
           {/* <div>{JSON.stringify(this.props)}</div> */}
           <MapDevTool />
           <div>{`Redux Counter: ${counterValue}`}</div>
+          <button onClick={this.loadPageData} >
+            {'loadPageData'}
+          </button>
+          <button onClick={this.loadUserData} >
+            {'loadUserData'}
+          </button>
           <button onClick={this.incrementCounterAsync} >
             {'incrementCounterAsyc'}
           </button>

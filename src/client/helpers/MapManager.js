@@ -1,7 +1,7 @@
 import lodashGet from 'lodash/get';
 import {
   appendScriptToHead,
-} from 'domUtils';
+} from 'helpers/domUtils';
 
 
 export const BASIC_MAP_TYPE_ROADMAP = 'roadmap';

@@ -27,11 +27,14 @@ function AttachReduxWithArgs(/* args */) {
       static async getInitialProps( nextJSContext ) {
 
         if ( __SERVER__ ) {
+          const { res } = nextJSContext;
           serverStore = createStore();
           serverStore.dispatch( makeAction(
             execute(ACTION_INCREMENT_COUNTER)
           ) );
           serverStoreInitialState = serverStore.getState();
+          // Pass the store to the child components, for SSR.
+          res.locals.reduxStore = serverStore;
         }
         let wrappedComponentInitialProps = {};
         if ( WrappedComponent.getInitialProps ) {
