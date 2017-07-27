@@ -6,6 +6,7 @@ import next from 'next';
 import dotenv from 'dotenv';
 
 import api from 'api';
+import pageRoutes from './pageRoutes';
 
 // Load dotenv
 let envs = null;
@@ -28,10 +29,15 @@ if ( envs && envs.parsed ) {
   Object.assign( global, globals );
 }
 
+import {
+  API_PREFIX,
+  APP_PORT,
+} from 'constants';
+
 const dev = process.env.NODE_ENV !== 'production';
 
 const app = next({ dev });
-const handle = app.getRequestHandler();
+const handler = pageRoutes.getRequestHandler(app);
 
 app.prepare()
   .then(() => {
@@ -39,25 +45,24 @@ app.prepare()
     server.use(favicon(path.resolve(__dirname, '../../static/favicon.ico')));
 
     // API server
-    server.use('/api', api);
+    server.use(API_PREFIX, api);
+
+    server.get('/hello', (req, res) => {
+      return res.send('hello');
+    });
+
+    // NextJS handled routes
+    server.use(handler);
 
     // NOTE: Add custom route handling logic here
     // server.get('/a', (req, res) => {
     //   return app.render(req, res, '/b', req.query);
     // });
 
-    server.get('/hello', (req, res) => {
-      return res.send('hello');
-    });
-
-    server.get('*', (req, res) => {
-      return handle(req, res);
-    });
-
-    server.listen(8050, (err) => {
+    server.listen(APP_PORT, (err) => {
       if (err) {
         throw err;
       }
-      console.log('> Ready on http://localhost:8050'); // eslint-disable-line no-console
+      console.log(`> Ready on http://localhost:${APP_PORT}`); // eslint-disable-line no-console
     });
   });

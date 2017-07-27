@@ -2,7 +2,9 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { wrapDisplayName } from 'recompose';
 import { Provider as ReduxStoreProvider } from 'react-redux';
+import { END as REDUX_SAGA_END } from 'redux-saga';
 
+import rootSaga from 'redux-modules/rootSaga';
 import createStore from 'redux-modules/createStore';
 import makeAction, {
   execute,
@@ -15,6 +17,7 @@ import {
 let clientStore = null;
 let serverStore = null;
 let serverStoreInitialState = null;
+let rootTask = null;
 function AttachReduxWithArgs(/* args */) {
 
   function AttachRedux( WrappedComponent ) {
@@ -28,29 +31,40 @@ function AttachReduxWithArgs(/* args */) {
 
         if ( __SERVER__ ) {
           const { res } = context;
-          serverStore = createStore();
+          const { store, sagaMiddleware } = createStore();
+          serverStore = store;
+          rootTask = sagaMiddleware.run(rootSaga);
           serverStore.dispatch( makeAction(
             execute(ACTION_INCREMENT_COUNTER)
           ) );
-          serverStoreInitialState = serverStore.getState();
-          // Pass the store to the child components, for SSR.
+          // Pass the store so the child component can dispatch actions in it's own getInitialProps
           res.locals.reduxStore = serverStore;
         }
         let wrappedComponentInitialProps = {};
+        // Let the child components execute their actions as needed
         if ( WrappedComponent.getInitialProps ) {
           wrappedComponentInitialProps = await WrappedComponent.getInitialProps(context);
         }
-        return {
-          ...wrappedComponentInitialProps,
-          serverStoreInitialState,
-        };
+        if ( __SERVER__ ) {
+          // Dispatch END, prevents new actions from coming in.  Existing actions will finish.
+          serverStore.dispatch(REDUX_SAGA_END);
+          // Wait for remaining actions to finish.
+          await rootTask.done;
+          // Make initial state be available to the client as a prop
+          serverStoreInitialState = serverStore.getState();
+          return {
+            ...wrappedComponentInitialProps,
+            serverStoreInitialState,
+          };
+        }
+        return wrappedComponentInitialProps;
       }
 
       constructor( props ) {
         super(props);
         if ( __CLIENT__ ) {
           if ( !clientStore ) {
-            clientStore = createStore( props.serverStoreInitialState );
+            clientStore = createStore( props.serverStoreInitialState ).store;
             window.store = clientStore;
           }
         }

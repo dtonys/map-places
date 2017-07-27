@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 
 import {
-  startSuccessErrorFlow,
+  apiFlow,
   createSagaWatcher,
 } from 'helpers/sagaHelpers';
 
@@ -31,7 +31,7 @@ function mockAPIWithDelay( delayMs, error ) {
 }
 
 function* runIncrementAsync({ delayMs }) {
-  const flowActions = yield* startSuccessErrorFlow(
+  const flowActions = yield* apiFlow(
     mockAPIWithDelay.bind( null, delayMs, false ),
     ACTION_INCREMENT_COUNTER_ASYNC,
   );

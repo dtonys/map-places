@@ -2,6 +2,9 @@ import lodashGet from 'lodash/get';
 import {
   appendScriptToHead,
 } from 'helpers/domUtils';
+import uuidv1 from 'uuid/v1';
+import lodashFindIndex from 'lodash/findIndex';
+import lodashNoOp from 'lodash/noop';
 
 
 export const BASIC_MAP_TYPE_ROADMAP = 'roadmap';
@@ -65,6 +68,8 @@ const MapManager = {
   initializeComplete: null,
   googleMap: null,
   googleMapMarkers: {},
+  onMapClickListeners: [],
+  onMarkerClickListeners: [],
 
   /** Private methods **/
   _createMapDomNode: function () { // eslint-disable-line func-names
@@ -96,8 +101,16 @@ const MapManager = {
       ...getMapControlOptionsDefault(),
     });
     this.googleMap.addListener('click', (event) => {
-      const latLng = event.latLng;
-      console.log(`clicked map at ${latLng.lat()} ${latLng.lng()} `); // eslint-disable-line no-console
+      const clickedLat = event.latLng.lat();
+      const clickedLng = event.latLng.lng();
+
+      console.log(`clicked map at ${clickedLat} ${clickedLng} `); // eslint-disable-line no-console
+      this.onMapClickListeners.forEach((fnObj) => {
+        fnObj.onClickFn({
+          lat: clickedLat,
+          lng: clickedLng,
+        });
+      });
     });
 
     // NOTE: Expose for debugging purposes.
@@ -109,22 +122,20 @@ const MapManager = {
     this._createMapDomNode();
     this.initializeComplete = this._loadGoogleMapsScript()
       .then(() => {
-        console.log(' _loadGoogleMapsScript finished ');
         this._createGoogleMap( initialCenterLatLng );
       });
   },
-  insertMapToDom: async function insertMapToDom( containerDomNode ) {
-    await this.initializeComplete;
+
+  insertMapToDom: function insertMapToDom( containerDomNode ) {
     containerDomNode.appendChild(this._mapDomNode);
     // NOTE: Trigger a resize to make the map appear
     google.maps.event.trigger(this.googleMap, 'resize'); // eslint-disable-line
     return true;
   },
-  attachMarkerToMap: async function attachMarkerToMap({ lat, lng }) {
-    await this.initializeComplete;
+  attachMarkerToMap: function attachMarkerToMap({ lat, lng }) {
     const latLngUID = `${lat}_${lng}`;
     if ( this.googleMapMarkers[latLngUID] ) {
-      return false;
+      return lodashNoOp;
     }
     const marker = new google.maps.Marker({
       position: { lat, lng },
@@ -132,12 +143,79 @@ const MapManager = {
       icon: ICON_PATH,
     });
     marker.addListener('click', () => {
-      const latLng = marker.getPosition();
-      console.log(`clicked marker at ${latLng} `); // eslint-disable-line no-console
-      this.googleMap.setCenter(marker.getPosition());
+      const latLngFns = marker.getPosition();
+      const clickedLat = latLngFns.lat();
+      const clickedLng = latLngFns.lng();
+      console.log(`clicked marker at ${clickedLat}, ${clickedLng} `); // eslint-disable-line no-console
+      this.onMarkerClickListeners.forEach((fnObj) => {
+        fnObj.onClickFn({
+          marker,
+          latLngUID,
+        });
+      });
     });
     this.googleMapMarkers[latLngUID] = marker;
-    return true;
+    return {
+      marker,
+      latLngUID,
+    };
+  },
+  removeMarkerFromMap: function (latLngUID) { // eslint-disable-line func-names
+    const marker = this.googleMapMarkers[latLngUID];
+    if ( !marker ) {
+      return;
+    }
+    this.googleMapMarkers[latLngUID].setMap(null);
+    delete this.googleMapMarkers[latLngUID];
+  },
+  addOnMapClickListener: function ( onClickFn ) { // eslint-disable-line func-names
+    const fnId = uuidv1();
+    this.onMapClickListeners.push({
+      id: fnId,
+      onClickFn,
+    });
+    // return onRemove
+    return function removeMapClickListener() {
+      const index = lodashFindIndex( this.onMapClickListeners, { id: fnId });
+      if ( index !== -1 ) {
+        const removedFn = this.onMapClickListeners.splice(index, 1);
+        return removedFn;
+      }
+      return lodashNoOp;
+    };
+  },
+  addOnMarkerClickListener: function (onClickFn) { // eslint-disable-line func-names
+    const fnId = uuidv1();
+    this.onMarkerClickListeners.push({
+      id: fnId,
+      onClickFn,
+    });
+    // return onRemove
+    return function removeMarkerClickListener() {
+      const index = lodashFindIndex( this.onMarkerClickListeners, { id: fnId });
+      if ( index !== -1 ) {
+        const removedFn = this.onMarkerClickListeners.splice(index, 1);
+        return removedFn;
+      }
+      return lodashNoOp;
+    };
+  },
+
+  resetMap: function () { // eslint-disable-line func-names
+    this.deleteAllMarkers();
+    this.removeAllListeners();
+  },
+
+  deleteAllMarkers: function () { // eslint-disable-line func-names
+    this.googleMapMarkers.forEach((marker) => {
+      marker.setMap(null);
+    });
+    this.googleMapMarkers = [];
+  },
+
+  removeAllListeners: function () { // eslint-disable-line func-names
+    this.onMapClickListeners = [];
+    this.onMarkerClickListeners = [];
   },
 };
 

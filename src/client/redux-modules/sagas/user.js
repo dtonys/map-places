@@ -1,11 +1,18 @@
 import {
   fork,
   all,
+  // take,
 } from 'redux-saga/effects';
 import {
-  startSuccessErrorFlow,
+  apiFlow,
   createSagaWatcher,
 } from 'helpers/sagaHelpers';
+// import {
+//   request,
+// } from 'helpers/reduxAction';
+import {
+  DEFERRED,
+} from 'redux-modules/middleware/sagaPromiseMiddlware';
 
 import {
   ACTION_LOAD_USER,
@@ -18,18 +25,26 @@ import {
 } from 'web-api/index';
 
 function* loadPage() {
-  yield* startSuccessErrorFlow(
+  yield* apiFlow(
     loadPageDataApi,
     ACTION_LOAD_PAGE,
   );
 }
 
-function* loadUser() {
-  yield* startSuccessErrorFlow(
+function* loadUser({ [DEFERRED]: deferred }) {
+  yield* apiFlow(
     loadUserApi,
     ACTION_LOAD_USER,
+    deferred,
   );
 }
+
+// function* watchLoadUser() {
+//   while ( true ) { // eslint-disable-line no-constant-condition
+//     const action =  yield take( request( ACTION_LOAD_USER ) );
+//     yield* loadUser( action );
+//   }
+// }
 
 
 function* userSaga() {

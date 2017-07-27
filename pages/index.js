@@ -17,13 +17,11 @@ import {
 
 import makeAction, {
   request,
-  execute,
 } from 'helpers/reduxAction';
-import {
-  ACTION_INCREMENT_COUNTER,
-  ACTION_DECREMENT_COUNTER,
-  ACTION_INCREMENT_COUNTER_ASYNC,
-} from 'redux-modules/actions/counter';
+import  {
+  DEFERRED,
+} from 'redux-modules/middleware/sagaPromiseMiddlware';
+
 import {
   ACTION_LOAD_USER,
   ACTION_LOAD_PAGE,
@@ -129,15 +127,10 @@ class MapDevTool extends Component {
 
 @clientEntry()
 @attachRedux()
-@connect(
-  ( globalState ) => ({
-    counterValue: globalState.counter,
-  })
-)
+@connect()
 class HomePage extends Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
-    counterValue: PropTypes.number.isRequired,
   }
 
   // NOTE: Context object contains:
@@ -149,14 +142,22 @@ class HomePage extends Component {
   // jsonPageRes,          // page response on client (__CLIENT__)
 
   static async getInitialProps( context ) {
-    // const {
-    //   req: expressRequest,
-    //   res: expressResponse,
-    // } = context;
-    const homePageFetched = await new Promise(( resolve ) => {
-      setTimeout( resolve.bind( null, true ), 100);
-    });
-    return { homePageFetched };
+    const { res } = context;
+    let successAction = null;
+    try {
+      successAction = await res.locals.reduxStore.dispatch({
+        ...makeAction( request( ACTION_LOAD_USER ) ),
+        [DEFERRED]: true, // This action returns a promise
+      });
+    }
+    catch ( errorAction ) {
+      // USER NOT LOGGED IN, try a redirect to login page
+    }
+    return {
+      user: ( successAction && successAction.payload
+        ? successAction.payload
+        : null  ),
+    };
   }
 
   constructor(props) {
@@ -164,10 +165,16 @@ class HomePage extends Component {
     this.currentPositionLatLng = null;
     const isGoogleMapsLoaded = getIsGoogleMapsLoaded();
     this.state = {
-      count: 0,
       mapLoaded: isGoogleMapsLoaded,
       currentPositionLatLng: null,
     };
+  }
+
+  componentDidMount() {
+    MapManager.initializeComplete
+      .then(() => {
+        this.initializeMap();
+      });
   }
 
   surroundCurrentPositionWithMarkers = ({ lat, lng }) => {
@@ -177,28 +184,11 @@ class HomePage extends Component {
     MapManager.attachMarkerToMap({ lat, lng: lng - 0.03 });
   }
 
-  componentDidMount() {
-    if ( !this.state.mapLoaded ) {
-      MapManager.initializeComplete
-        .then(() => {
-          this.setState({
-            mapLoaded: true,
-          });
-        });
-    }
-    else {
-      MapManager.insertMapToDom(document.querySelector('#mapRegion'));
-    }
+  centerMapOnCurrentPosition = () => {
+    MapManager.googleMap.setCenter(this.state.currentPositionLatLng);
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const onMapLoaded = !prevState.mapLoaded && this.state.mapLoaded;
-    if ( onMapLoaded ) {
-      this.initializeMap();
-    }
-  }
-
-  initializeMap = () => {
+  initializeMap() {
     MapManager.insertMapToDom(document.querySelector('#mapRegion'));
     tryGetCurrentPosition()
       .then(({ lat, lng }) => {
@@ -211,35 +201,6 @@ class HomePage extends Component {
       });
   }
 
-  centerMapOnCurrentPosition = () => {
-    MapManager.googleMap.setCenter(this.state.currentPositionLatLng);
-  }
-
-  incrementCounterAsync = () => {
-    this.props.dispatch( makeAction(
-      request(ACTION_INCREMENT_COUNTER_ASYNC),
-      { delayMs: 2000 }
-    ) );
-  }
-
-  incrementCounter = () => {
-    this.props.dispatch( makeAction(
-      execute(ACTION_INCREMENT_COUNTER)
-    ) );
-  }
-
-  decrementCounter = () => {
-    this.props.dispatch( makeAction(
-      execute(ACTION_DECREMENT_COUNTER)
-    ) );
-  }
-
-  loadUserData = () => {
-    this.props.dispatch( makeAction(
-      request(ACTION_LOAD_USER)
-    ) );
-  }
-
   loadPageData = () => {
     this.props.dispatch( makeAction(
       request(ACTION_LOAD_PAGE)
@@ -250,31 +211,11 @@ class HomePage extends Component {
     const {
       currentPositionLatLng,
     } = this.state;
-    const {
-      counterValue,
-    } = this.props;
 
     return (
       <div>
         <Layout htmlTitle={'Home'}>
-          {/* <div>{JSON.stringify(this.props)}</div> */}
           <MapDevTool />
-          <div>{`Redux Counter: ${counterValue}`}</div>
-          <button onClick={this.loadPageData} >
-            {'loadPageData'}
-          </button>
-          <button onClick={this.loadUserData} >
-            {'loadUserData'}
-          </button>
-          <button onClick={this.incrementCounterAsync} >
-            {'incrementCounterAsyc'}
-          </button>
-          <button onClick={this.incrementCounter} >
-            {'Redux Inc Counter'}
-          </button>
-          <button onClick={this.decrementCounter} >
-            {'Redux Dec Counter'}
-          </button>
           <div className="mapRegionWrap">
             <div id="mapRegion" className="mapRegion" />
             { currentPositionLatLng &&

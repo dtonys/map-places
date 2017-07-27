@@ -1,4 +1,7 @@
 import superagent from 'superagent';
+import {
+  APP_PORT,
+} from 'constants';
 
 export const UNKNOWN_ERROR = 'UNKNOWN_ERROR';
 export const NETWORK_ERROR = 'NETWORK_ERROR';
@@ -59,7 +62,12 @@ function webApiHandleError( networkError, response, responseBody ) {
 
 export default function webApiRequest( method, path, params) {
   return new Promise(( resolve, reject ) => {
-    const request = superagent( method, path);
+    let updatedPath = path;
+    if ( __SERVER__ ) {
+      updatedPath = `http://localhost:${APP_PORT}${path}`;
+    }
+
+    const request = superagent( method, updatedPath);
     // NOTE: Disable error on HTTP 4xx or 5xx. This means:
     // - `networkError` will only be populated if `resonse.text` is falsey
     // - Only one of `networkError` or `response` will be set in the callback, never both.

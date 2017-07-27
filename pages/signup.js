@@ -8,7 +8,7 @@ const mockSubmit = (event) => { event.preventDefault(); };
 
 @clientEntry()
 @attachRedux()
-class LoginPage extends Component {
+class SignupPage extends Component {
   render() {
     return (
       <div>
@@ -49,4 +49,4 @@ class LoginPage extends Component {
   }
 }
 
-export default LoginPage;
+export default SignupPage;

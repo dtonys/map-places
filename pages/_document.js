@@ -30,9 +30,9 @@ export default class MyDocument extends Document {
           <meta name="msapplication-TileImage" content="/static/ms-icon-144x144.png" />
           <meta name="theme-color" content="#ffffff" />
 
-          <link rel="stylesheet" type="text/css" href="static/css/reset.css" />
-          <link rel="stylesheet" type="text/css" href="static/css/kube.min.css" />
-          <link rel="stylesheet" type="text/css" href="static/css/default.css" />
+          <link rel="stylesheet" type="text/css" href="/static/css/reset.css" />
+          <link rel="stylesheet" type="text/css" href="/static/css/kube.min.css" />
+          <link rel="stylesheet" type="text/css" href="/static/css/default.css" />
         </Head>
         <body className="custom_class">
           <Main />

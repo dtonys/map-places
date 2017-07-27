@@ -14,7 +14,7 @@ import makeAction, {
 } from 'helpers/reduxAction';
 
 
-export function* startSuccessErrorFlow( api, actionName ) {
+export function* apiFlow( api, actionName, deferred ) {
 
   let responseData = null;
   const dispatchedActionsTracker = {
@@ -38,12 +38,14 @@ export function* startSuccessErrorFlow( api, actionName ) {
     const _successAction = makeAction( apiSuccess(actionName), responseData );
     yield put( _successAction );
     dispatchedActionsTracker.addAction('successAction', _successAction);
+    deferred.resolve(_successAction);
   }
   catch ( errorData ) {
     const _errorAction = makeAction( apiError(actionName), errorData );
     yield put( _errorAction );
     responseData = errorData;
     dispatchedActionsTracker.addAction('errorAction', _errorAction);
+    deferred.reject(_errorAction);
   }
 
   return dispatchedActionsTracker;
@@ -58,10 +60,10 @@ export function createSagaWatcher( actionType, actionRunner ) {
         requestFork(actionType),
       ]);
       if ( action.type === request(actionType) ) {
-        yield* actionRunner( action.payload );
+        yield* actionRunner( action );
       }
       if ( action.type === requestFork(actionType) ) {
-        fork( actionRunner, action.payload );
+        fork( actionRunner, action );
       }
     }
   };

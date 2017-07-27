@@ -91,6 +91,7 @@ module.exports = {
       "WithStatement",
     ],
     "lines-around-directive": "off",
+    "class-methods-use-this": "off",
 
     //
     // React:

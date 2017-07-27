@@ -5,7 +5,7 @@ import {
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
 import rootReducer from 'redux-modules/rootReducer';
-import rootSaga from 'redux-modules/rootSaga';
+import sagaPromiseMiddleware from 'redux-modules/middleware/sagaPromiseMiddlware';
 
 function createStore( initialState ) {
   const middleware = [];
@@ -152,15 +152,15 @@ function createStore( initialState ) {
 
   // saga
   const sagaMiddleware = createSagaMiddleware();
+  middleware.push( sagaPromiseMiddleware );
   middleware.push( sagaMiddleware );
   const store = reduxCreateStore(
     rootReducer,
     initialState,
     applyMiddleware( ...middleware ),
   );
-  sagaMiddleware.run(rootSaga);
 
-  return store;
+  return { store, sagaMiddleware };
 }
 
 export default createStore;
