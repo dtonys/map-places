@@ -85,7 +85,7 @@ const MapManager = {
         return;
       }
       window.initMap = resolve;
-      appendScriptToHead(`https://maps.googleapis.com/maps/api/js?v=3&key=${GOOGLE_MAPS_API_KEY}&callback=initMap`);
+      appendScriptToHead(`https://maps.googleapis.com/maps/api/js?v=3&key=${GOOGLE_MAPS_API_KEY}&callback=initMap&libraries=places`);
     });
   },
   _createGoogleMap: function ({ // eslint-disable-line func-names

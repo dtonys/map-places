@@ -1,6 +1,10 @@
 import { Component } from 'react';
 import clientEntry from 'helpers/clientEntry';
 import attachRedux from 'helpers/attachRedux';
+import PlacesAutocomplete, {
+  geocodeByAddress,
+  getLatLng,
+} from 'react-places-autocomplete';
 
 import MapManager, {
   getIsGoogleMapsLoaded,
@@ -11,8 +15,10 @@ import {
 } from 'constants';
 
 const CONTENT_REGION_WIDTH = 960;
-const ACTIVE_ICON_PATH = '/static/pin_w30_active.svg';
 const ICON_PATH = '/static/pin_w30.svg';
+const ACTIVE_ICON_PATH = '/static/pin_w30_active.svg';
+const GREYED_ICON_PATH = '/static/pin_w30_greyed.svg';
+
 
 @clientEntry()
 @attachRedux()
@@ -26,8 +32,12 @@ class PlotPlaces extends Component {
       form: {
         lat: '',
         lng: '',
+        label: '',
       },
       activeMarkerUUID: null,
+      activeMarkerSaved: false,
+      autoCompleteAddress: '',
+      autoCompleteSelected: false,
     };
   }
 
@@ -36,6 +46,9 @@ class PlotPlaces extends Component {
       .then(() => {
         MapManager.insertMapToDom(document.querySelector('#mapRegion'));
         this.setupMapListeners();
+        this.setState({
+          mapLoaded: true,
+        });
       });
   }
 
@@ -44,11 +57,21 @@ class PlotPlaces extends Component {
     MapManager.clearPoints();
   }
 
-  plotPoint = ({ lat, lng }) => {
+  plotPoint = ({ lat, lng, addressText }) => {
+    // check for existing marker
+    const existingMarker = MapManager.googleMapMarkers[`${lat}_${lng}`];
+    if ( existingMarker ) {
+      return;
+    }
+
     // de-activate the currently selected marker
     const activeMarker = MapManager.googleMapMarkers[this.state.activeMarkerUUID];
     if ( activeMarker ) {
-      activeMarker.setIcon( ICON_PATH );
+      activeMarker.setIcon(
+        activeMarker.MP_saved
+          ? ICON_PATH
+          : GREYED_ICON_PATH
+      );
     }
 
     // create the marker
@@ -59,10 +82,13 @@ class PlotPlaces extends Component {
 
     // activate the created marker
     marker.setIcon( ACTIVE_ICON_PATH );
+    marker.MP_saved = false;
     this.setState({
       form: {
+        ...this.state.form,
         lat: lat.toFixed(6).toString(),
         lng: lng.toFixed(6).toString(),
+        label: addressText || this.state.label,
       },
       activeMarkerUUID: latLngUID,
     });
@@ -72,7 +98,11 @@ class PlotPlaces extends Component {
     // de-activate the currently selected marker
     const activeMarker = MapManager.googleMapMarkers[this.state.activeMarkerUUID];
     if ( activeMarker ) {
-      activeMarker.setIcon( ICON_PATH );
+      activeMarker.setIcon(
+        activeMarker.MP_saved
+          ? ICON_PATH
+          : GREYED_ICON_PATH
+      );
     }
 
     // activate the selected marker
@@ -82,10 +112,12 @@ class PlotPlaces extends Component {
     const _lng = lng();
     this.setState({
       form: {
+        ...this.state.form,
         lat: _lat.toFixed(6).toString(),
         lng: _lng.toFixed(6).toString(),
       },
       activeMarkerUUID: latLngUID,
+      activeMarkerSaved: marker.MP_saved,
     });
   }
 
@@ -104,14 +136,129 @@ class PlotPlaces extends Component {
     event.preventDefault();
   }
 
+  deletePlace = () => {
+    MapManager.removeMarkerFromMap(this.state.activeMarkerUUID);
+    this.setState({
+      form: {
+        ...this.state.form,
+        lat: '',
+        lng: '',
+        label: '',
+      },
+      activeMarkerUUID: null,
+    });
+  }
+
+  savePlace = () => {
+    const activeMarker = MapManager.googleMapMarkers[this.state.activeMarkerUUID];
+    activeMarker.MP_saved = true;
+    activeMarker.setIcon( ICON_PATH );
+    this.setState({
+      activeMarkerSaved: true,
+    });
+  }
+
+  deactivatePlace = () => {
+    const activeMarker = MapManager.googleMapMarkers[this.state.activeMarkerUUID];
+    activeMarker.MP_saved = false;
+    activeMarker.setIcon( GREYED_ICON_PATH );
+  }
+
+  onAutoCompleteChange = ( address ) => {
+    this.setState({
+      autoCompleteAddress: address,
+      autoCompleteSelected: false,
+    });
+  }
+
+  onAutoCompleteSelect = (address /* , placeId */) => {
+    this.setState({
+      autoCompleteAddress: address,
+      autoCompleteSelected: true,
+    });
+  }
+
+  clearAutoCompleteAddress = () => {
+    this.setState({
+      autoCompleteAddress: '',
+      autoCompleteSelected: false,
+    });
+  }
+
+  plotSearchedPoint = () => {
+    geocodeByAddress(this.state.autoCompleteAddress)
+      .then((results) => getLatLng(results[0]))
+      .then(({ lat, lng }) => {
+        this.plotPoint({ lat, lng, addressText: this.state.autoCompleteAddress });
+      })
+      .catch((error) => {
+        console.error('Error', error);
+      });
+  }
+
   render() {
+    const {
+      activeMarkerUUID,
+      activeMarkerSaved,
+      autoCompleteAddress,
+      autoCompleteSelected,
+      mapLoaded,
+    } = this.state;
+
+    const autoCompleteInputProps = {
+      value: autoCompleteAddress,
+      onChange: this.onAutoCompleteChange,
+    };
+
+    const autoCompleteStyles = {
+      input: {
+        paddingRight: '25px',
+      },
+    };
+
     return (
       <div>
         <div className="nav">
           <div className="navContent">
-            <button className="addPlace">
-              {'addPlace'}
-            </button>
+            { mapLoaded &&
+              <div className="navContentRight" >
+
+                <div
+                  className="autoCompleteWrap"
+                  style={{
+                    width: '80%',
+                    position: 'relative',
+                  }}
+                >
+                  <PlacesAutocomplete
+                    inputProps={autoCompleteInputProps}
+                    onSelect={this.onAutoCompleteSelect}
+                    styles={autoCompleteStyles}
+                  />
+                  { Boolean(autoCompleteAddress) &&
+                    <div
+                      className="autoCompleteX"
+                      onClick={this.clearAutoCompleteAddress}
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '10px',
+                        cursor: 'pointer',
+                      }}
+                    >{'X'}</div>
+                  }
+                </div>
+                <div style={{ marginRight: '10px' }}></div>
+                <button
+                  onClick={ this.plotSearchedPoint }
+                  style={{ flex: 1 }}
+                  className="button secondary"
+                  disabled={!autoCompleteSelected}
+                >
+                  {'Go'}
+                </button>
+              </div>
+            }
           </div>
         </div>
         <div className="scrollableContentRegionWrap" >
@@ -122,7 +269,13 @@ class PlotPlaces extends Component {
                 <form method="post" action="" className="form leftForm" onSubmit={this.mockSubmit} >
                   <div className="form-item">
                     <label htmlFor="label" >Label</label>
-                    <input className="small" type="text" name="label" id="label" />
+                    <input
+                      className="small"
+                      type="text"
+                      name="label"
+                      id="label"
+                      value={this.state.form.label}
+                    />
                   </div>
                   <div className="form-item">
                     <div className="row auto gutters">
@@ -150,19 +303,28 @@ class PlotPlaces extends Component {
                   </div>
                 </form>
               </div>
-              <div className="leftRegionFooter">
-                <button className="actionBtn">
-                  actionBtn
-                </button>
-                <span style={{ marginRight: '10px' }} ></span>
-                <button className="actionBtn">
-                  actionBtn
-                </button>
-                <span style={{ marginRight: '10px' }} ></span>
-                <button className="actionBtn">
-                  actionBtn
-                </button>
-              </div>
+              { activeMarkerUUID &&
+                <div className="leftRegionFooter">
+                  { !activeMarkerSaved &&
+                    <button className="actionBtn" onClick={ this.deletePlace } >
+                      {'delete'}
+                    </button>
+                  }
+                  <span style={{ marginRight: '10px' }} ></span>
+                  <button className="actionBtn" onClick={ this.savePlace } >
+                    {'save'}
+                  </button>
+                  { activeMarkerSaved &&
+                    <div>
+                      <span style={{ marginRight: '10px' }} ></span>
+                      <button className="actionBtn" onClick={ this.deactivatePlace } >
+                        {'deactivate'}
+                      </button>
+                    </div>
+                  }
+                  <span style={{ marginRight: '10px' }} ></span>
+                </div>
+              }
             </div>
             <div className="rightRegion" id="mapRegion" >
             </div>
@@ -183,14 +345,20 @@ class PlotPlaces extends Component {
             left: 0;
             right: 0;
             border-bottom: solid black 2px;
+            z-index: 2;
           }
           .navContent {
             width: ${CONTENT_REGION_WIDTH}px;
             height: 100%;
             margin: auto;
-            border: solid red 2px;
             display: flex;
             align-items: center;
+            justify-content: flex-end;
+          }
+          .navContentRight {
+            width: 50%;
+            display: flex;
+            padding: 0 10px;
           }
           .scrollableContentRegionWrap {
             position: absolute;
@@ -198,18 +366,19 @@ class PlotPlaces extends Component {
             left: 0;
             right: 0;
             bottom: 0;
+            z-index: 1;
           }
           .contentRegion {
             width: ${CONTENT_REGION_WIDTH}px;
             height: 100%;
             margin: auto;
-            background: green;
             display: flex;
           }
           .leftRegion {
             width: 50%;
             border-right: solid black 2px;
             position: relative;
+            border-left: solid black 2px;
           }
           .leftRegionScrollableContent {
             position: absolute;
@@ -217,7 +386,6 @@ class PlotPlaces extends Component {
             left: 0;
             right: 0;
             bottom: ${NAVBAR_HEIGHT}px;
-            border: solid blue 2px;
             overflow: auto;
           }
           .leftRegionFooter {
@@ -226,9 +394,10 @@ class PlotPlaces extends Component {
             right: 0;
             bottom: 0;
             height: ${NAVBAR_HEIGHT}px;
-            border: solid black 2px;
+            border-top: solid black 2px;
             display: flex;
             align-items: center;
+            justify-content: flex-end;
           }
           .rightRegion {
             width: 50%;
