@@ -88,7 +88,7 @@ class PlotPlaces extends Component {
         ...this.state.form,
         lat: lat.toFixed(6).toString(),
         lng: lng.toFixed(6).toString(),
-        label: addressText || this.state.label,
+        label: addressText || this.state.form.label,
       },
       activeMarkerUUID: latLngUID,
     });
