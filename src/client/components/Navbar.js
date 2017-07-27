@@ -50,7 +50,7 @@ const Navbar = () => {
           top: 0;
           left: 0;
           right: 0;
-          // border: solid black 1px;
+          border-bottom: solid black 2px;
 
         }
         .logoName {

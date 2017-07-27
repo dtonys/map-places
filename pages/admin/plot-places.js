@@ -115,6 +115,7 @@ class PlotPlaces extends Component {
         ...this.state.form,
         lat: _lat.toFixed(6).toString(),
         lng: _lng.toFixed(6).toString(),
+        label: '',
       },
       activeMarkerUUID: latLngUID,
       activeMarkerSaved: marker.MP_saved,
@@ -186,14 +187,28 @@ class PlotPlaces extends Component {
   }
 
   plotSearchedPoint = () => {
+
     geocodeByAddress(this.state.autoCompleteAddress)
       .then((results) => getLatLng(results[0]))
       .then(({ lat, lng }) => {
         this.plotPoint({ lat, lng, addressText: this.state.autoCompleteAddress });
+        MapManager.googleMap.setCenter({ lat, lng });
       })
       .catch((error) => {
-        console.error('Error', error);
+        console.error('Error', error); // eslint-disable-line no-console
       });
+  }
+
+  onInputChange = ( event ) => {
+    const value = event.target.value;
+    const inputKey = event.currentTarget.getAttribute('data-form-key');
+
+    this.setState({
+      form: {
+        ...this.state.form,
+        [inputKey]: value,
+      },
+    });
   }
 
   render() {
@@ -275,6 +290,8 @@ class PlotPlaces extends Component {
                       name="label"
                       id="label"
                       value={this.state.form.label}
+                      data-form-key={'label'}
+                      onChange={this.onInputChange}
                     />
                   </div>
                   <div className="form-item">
@@ -287,6 +304,7 @@ class PlotPlaces extends Component {
                           name="latitude"
                           id="latitude"
                           value={this.state.form.lat}
+                          disabled
                         />
                       </div>
                       <div className="col">
@@ -297,6 +315,7 @@ class PlotPlaces extends Component {
                           name="longitude"
                           id="longitude"
                           value={this.state.form.lng}
+                          disabled
                         />
                       </div>
                     </div>
@@ -369,7 +388,7 @@ class PlotPlaces extends Component {
             z-index: 1;
           }
           .contentRegion {
-            width: ${CONTENT_REGION_WIDTH}px;
+            width: 100%;
             height: 100%;
             margin: auto;
             display: flex;

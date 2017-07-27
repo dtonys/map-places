@@ -3,10 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Layout from 'components/Layout';
-import MapManager, {
-  BASIC_MAP_TYPES,
-  getIsGoogleMapsLoaded,
-} from 'helpers/MapManager';
+import MapManager from 'helpers/MapManager';
 
 import clientEntry from 'helpers/clientEntry';
 import attachRedux from 'helpers/attachRedux';
@@ -27,103 +24,10 @@ import {
   ACTION_LOAD_PAGE,
 } from 'redux-modules/actions/user';
 
-class MapDevTool extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      show: false,
-      values: {
-        mapTypeId: BASIC_MAP_TYPES[0],
-      },
-    };
-  }
+import {
+  SIDEBAR_WIDTH,
+} from 'constants';
 
-  onInputChange = ( event ) => {
-    const value = event.target.value;
-    const inputKey = event.currentTarget.getAttribute('data-input-key');
-
-    this.setState({
-      values: {
-        ...this.state.values,
-        [inputKey]: value,
-      },
-    });
-
-    if ( inputKey === 'mapTypeId' ) {
-      MapManager.googleMap.setMapTypeId(value);
-    }
-  }
-
-  toggleShow = () => {
-    this.setState({
-      show: !this.state.show,
-    });
-  }
-
-  render() {
-    const {
-      show,
-      values: {
-        mapTypeId,
-      },
-    } = this.state;
-
-    return (
-      <div>
-
-        { !show && (
-          <button
-            className="mapDevToolShow"
-            onClick={this.toggleShow}
-          >{'Dev'}</button>
-        )}
-        { show && (
-          <div className="mapDevTool">
-            <p>Map Dev Tool</p>
-            <button
-              className="mapDevToolHide"
-              onClick={this.toggleShow}
-            >{'Hide'}</button>
-            <select
-              value={mapTypeId}
-              data-input-key={'mapTypeId'}
-              onChange={this.onInputChange}
-            >
-              { BASIC_MAP_TYPES.map((basicMapType) => (
-                <option
-                  key={basicMapType}
-                  value={basicMapType}
-                >
-                  {basicMapType}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-        <style jsx>{`
-          .mapDevToolShow {
-            position: absolute;
-            top: 0;
-            right: 0;
-          }
-          .mapDevToolHide {
-            position: absolute;
-            top: 0;
-            right: 0;
-          }
-          .mapDevTool {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            padding: 10px;
-            border: solid black 1px;
-          }
-        `}</style>
-      </div>
-    );
-  }
-}
 
 @clientEntry()
 @attachRedux()
@@ -163,9 +67,7 @@ class HomePage extends Component {
   constructor(props) {
     super(props);
     this.currentPositionLatLng = null;
-    const isGoogleMapsLoaded = getIsGoogleMapsLoaded();
     this.state = {
-      mapLoaded: isGoogleMapsLoaded,
       currentPositionLatLng: null,
     };
   }
@@ -215,22 +117,31 @@ class HomePage extends Component {
     return (
       <div>
         <Layout htmlTitle={'Home'}>
-          <MapDevTool />
-          <div className="mapRegionWrap">
-            <div id="mapRegion" className="mapRegion" />
-            { currentPositionLatLng &&
-              <div>
-                <button
-                  className="centerMap"
-                  onClick={this.centerMapOnCurrentPosition} >
-                  center
-                </button>
-                <div className="legend" >
-                  Legend
-                </div>
-              </div>
-            }
+          {/* <MapDevTool /> */}
+          <div className="mapSidebar">
+            LeftRegion
           </div>
+          <div className="mapContent">
+            <div id="mapRegion" className="mapRegion" >
+              { currentPositionLatLng &&
+                <div>
+                  <button
+                    className="centerMap"
+                    onClick={this.centerMapOnCurrentPosition} >
+                    center
+                  </button>
+                  <div className="legend" >
+                    Legend
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+          {/*
+            <div className="mapRegionWrap">
+
+          */}
+
         </Layout>
         <style jsx>{`
           .mapRegionWrap {
@@ -260,6 +171,22 @@ class HomePage extends Component {
             background: white;
             color: black;
             border: solid black 2px;
+          }
+
+          .mapSidebar {
+            position: absolute;
+            border-right: solid black 2px;
+            width: ${SIDEBAR_WIDTH}px;
+            top: 0;
+            left: 0;
+            bottom: 0;
+          }
+          .mapContent {
+            position: absolute;
+            top: 0;
+            left: ${SIDEBAR_WIDTH}px;
+            right: 0;
+            bottom: 0;
           }
         `}</style>
       </div>
