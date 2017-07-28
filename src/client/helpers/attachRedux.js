@@ -64,7 +64,9 @@ function AttachReduxWithArgs(/* args */) {
         super(props);
         if ( __CLIENT__ ) {
           if ( !clientStore ) {
-            clientStore = createStore( props.serverStoreInitialState ).store;
+            const { store, sagaMiddleware } = createStore( props.serverStoreInitialState );
+            clientStore = store;
+            sagaMiddleware.run(rootSaga);
             window.store = clientStore;
           }
         }

@@ -31,6 +31,21 @@ export function apiError( type ) {
   return `${type}/apiError`;
 }
 
+// Report an API start
+export function localStorageStart( type ) {
+  return `${type}/localStorageStart`;
+}
+
+// Report an API success
+export function localStorageSuccess( type ) {
+  return `${type}/localStorageSuccess`;
+}
+
+// Report an API error
+export function localStorageError( type ) {
+  return `${type}/localStorageError`;
+}
+
 // Report a timeout start
 export function timeoutStart( type ) {
   return `${type}/timeoutStart`;
@@ -45,3 +60,4 @@ export function timeoutEnd( type ) {
 export function execute( type ) {
   return `${type}/execute`;
 }
+

@@ -1,6 +1,9 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import clientEntry from 'helpers/clientEntry';
 import attachRedux from 'helpers/attachRedux';
+
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,
@@ -8,21 +11,49 @@ import PlacesAutocomplete, {
 
 import MapManager, {
   getIsGoogleMapsLoaded,
+  ICON_PATH,
+  ACTIVE_ICON_PATH,
+  GREYED_ICON_PATH,
 } from 'helpers/MapManager';
+
+import makeAction, {
+  request,
+} from 'helpers/reduxAction';
+import {
+  ACTION_LOAD_PLACES,
+  ACTION_CREATE_PLACE,
+  ACTION_UPDATE_PLACE,
+  // ACTION_GET_PLACE,
+  ACTION_DELETE_PLACE,
+} from 'redux-modules/actions/places';
+
+import {
+  extractPlacesLoadedFromStorage,
+  extractPlaces,
+} from 'redux-modules/reducers/places';
+
 
 import {
   NAVBAR_HEIGHT,
 } from 'constants';
 
 const CONTENT_REGION_WIDTH = 960;
-const ICON_PATH = '/static/pin_w30.svg';
-const ACTIVE_ICON_PATH = '/static/pin_w30_active.svg';
-const GREYED_ICON_PATH = '/static/pin_w30_greyed.svg';
 
 
 @clientEntry()
 @attachRedux()
+@connect(
+  (globalState) => ({
+    placesLoadedFromStorage: extractPlacesLoadedFromStorage(globalState),
+    places: extractPlaces(globalState),
+  })
+)
 class PlotPlaces extends Component {
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    placesLoadedFromStorage: PropTypes.bool.isRequired,
+    places: PropTypes.object,
+  }
 
   constructor( props ) {
     super(props);
@@ -49,12 +80,33 @@ class PlotPlaces extends Component {
         this.setState({
           mapLoaded: true,
         });
+        this.props.dispatch( makeAction(
+          request(ACTION_LOAD_PLACES)
+        ) );
       });
+  }
+
+  componentDidUpdate( prevProps /* , prevState */ ) {
+    const onPlacesLoaded = ( !prevProps.placesLoadedFromStorage && this.props.placesLoadedFromStorage );
+    if ( onPlacesLoaded ) {
+      this.populatePlacesFromStorage();
+    }
   }
 
   componentWillUnMount() {
     MapManager.removeAllListeners();
     MapManager.clearPoints();
+  }
+
+  populatePlacesFromStorage = () => {
+    Object.keys(this.props.places).forEach(( placeID ) => {
+      const { lat, lng, saved } = this.props.places[placeID];
+      MapManager.attachMarkerToMap({
+        lat,
+        lng,
+        saved,
+      });
+    });
   }
 
   plotPoint = ({ lat, lng, addressText }) => {
@@ -88,10 +140,22 @@ class PlotPlaces extends Component {
         ...this.state.form,
         lat: lat.toFixed(6).toString(),
         lng: lng.toFixed(6).toString(),
-        label: addressText || this.state.form.label,
+        label: addressText || '',
       },
       activeMarkerUUID: latLngUID,
     });
+
+    // Save the point
+    this.props.dispatch( makeAction(
+      request(ACTION_CREATE_PLACE),
+      {
+        id: latLngUID,
+        lat,
+        lng,
+        saved: false,
+      }
+    ) );
+
   }
 
   selectMarker = ({ marker, latLngUID }) => {
@@ -110,12 +174,15 @@ class PlotPlaces extends Component {
     const { lat, lng } = marker.getPosition();
     const _lat = lat();
     const _lng = lng();
+
+    const placeData = this.props.places[latLngUID];
+
     this.setState({
       form: {
         ...this.state.form,
         lat: _lat.toFixed(6).toString(),
         lng: _lng.toFixed(6).toString(),
-        label: '',
+        label: ( placeData && placeData.label ) ? placeData.label : '',
       },
       activeMarkerUUID: latLngUID,
       activeMarkerSaved: marker.MP_saved,
@@ -148,6 +215,12 @@ class PlotPlaces extends Component {
       },
       activeMarkerUUID: null,
     });
+    this.props.dispatch( makeAction(
+      request(ACTION_DELETE_PLACE),
+      {
+        id: this.state.activeMarkerUUID,
+      }
+    ) );
   }
 
   savePlace = () => {
@@ -157,12 +230,28 @@ class PlotPlaces extends Component {
     this.setState({
       activeMarkerSaved: true,
     });
+    this.props.dispatch( makeAction(
+      request(ACTION_UPDATE_PLACE),
+      {
+        id: this.state.activeMarkerUUID,
+        label: this.state.form.label,
+        saved: true,
+      }
+    ) );
   }
 
   deactivatePlace = () => {
     const activeMarker = MapManager.googleMapMarkers[this.state.activeMarkerUUID];
     activeMarker.MP_saved = false;
     activeMarker.setIcon( GREYED_ICON_PATH );
+    this.props.dispatch( makeAction(
+      request(ACTION_UPDATE_PLACE),
+      {
+        id: this.state.activeMarkerUUID,
+        label: this.state.form.label,
+        saved: false,
+      }
+    ) );
   }
 
   onAutoCompleteChange = ( address ) => {
@@ -235,45 +324,51 @@ class PlotPlaces extends Component {
       <div>
         <div className="nav">
           <div className="navContent">
-            { mapLoaded &&
-              <div className="navContentRight" >
-
-                <div
-                  className="autoCompleteWrap"
-                  style={{
-                    width: '80%',
-                    position: 'relative',
-                  }}
-                >
-                  <PlacesAutocomplete
-                    inputProps={autoCompleteInputProps}
-                    onSelect={this.onAutoCompleteSelect}
-                    styles={autoCompleteStyles}
-                  />
-                  { Boolean(autoCompleteAddress) &&
-                    <div
-                      className="autoCompleteX"
-                      onClick={this.clearAutoCompleteAddress}
-                      style={{
-                        position: 'absolute',
-                        top: '8px',
-                        right: '10px',
-                        cursor: 'pointer',
-                      }}
-                    >{'X'}</div>
-                  }
+            <div className="navContentLeft">
+              <a href="/" className="logoLink" >
+                <div className="logoName" >{'Map Places'}</div>
+              </a>
+            </div>
+            <div className="navContentRight" >
+              { mapLoaded &&
+                <div className="navContentRightInner">
+                  <div
+                    className="autoCompleteWrap"
+                    style={{
+                      width: '80%',
+                      position: 'relative',
+                    }}
+                  >
+                    <PlacesAutocomplete
+                      inputProps={autoCompleteInputProps}
+                      onSelect={this.onAutoCompleteSelect}
+                      styles={autoCompleteStyles}
+                    />
+                    { Boolean(autoCompleteAddress) &&
+                      <div
+                        className="autoCompleteX"
+                        onClick={this.clearAutoCompleteAddress}
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: '10px',
+                          cursor: 'pointer',
+                        }}
+                      >{'X'}</div>
+                    }
+                  </div>
+                  <div style={{ marginRight: '10px' }}></div>
+                  <button
+                    onClick={ this.plotSearchedPoint }
+                    style={{ flex: 1 }}
+                    className="button secondary"
+                    disabled={!autoCompleteSelected}
+                  >
+                    {'Go'}
+                  </button>
                 </div>
-                <div style={{ marginRight: '10px' }}></div>
-                <button
-                  onClick={ this.plotSearchedPoint }
-                  style={{ flex: 1 }}
-                  className="button secondary"
-                  disabled={!autoCompleteSelected}
-                >
-                  {'Go'}
-                </button>
-              </div>
-            }
+              }
+            </div>
           </div>
         </div>
         <div className="scrollableContentRegionWrap" >
@@ -376,6 +471,14 @@ class PlotPlaces extends Component {
           }
           .navContentRight {
             width: 50%;
+            padding: 0 10px;
+          }
+          .navContentRightInner {
+            width: 100%;
+            display: flex;
+          }
+          .navContentLeft {
+            width: 50%;
             display: flex;
             padding: 0 10px;
           }
@@ -428,6 +531,15 @@ class PlotPlaces extends Component {
           .form-item {
             margin-bottom: 1rem;
           }
+        .logoName {
+          font-size: 20px;
+          color: rgb(49, 52, 57);
+          cursor: pointer;
+          text-decoration: none;
+        }
+        .logoLink {
+          text-decoration: none;
+        }
         `}</style>
       </div>
     );

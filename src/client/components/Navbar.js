@@ -18,10 +18,13 @@ const Navbar = () => {
         <div style={{ marginRight: '10px' }} />
         <div className="item">Other</div>
       </div>
+
       <div className="section section-2">
-        <div className="searchWrap">
-          <input className="search" type="text" placeholder="Search" />
-        </div>
+        {/*
+          <div className="searchWrap">
+            <input className="search" type="text" placeholder="Search" />
+          </div>
+        */}
       </div>
       <div className="section section-3">
         <Link href="/login">

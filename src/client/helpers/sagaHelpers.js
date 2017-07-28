@@ -11,10 +11,17 @@ import makeAction, {
   apiStart,
   apiSuccess,
   apiError,
+  localStorageStart,
+  localStorageSuccess,
+  localStorageError,
 } from 'helpers/reduxAction';
 
 
-export function* apiFlow( api, actionName, deferred ) {
+// export function* apiFlow( api, actionName, deferred, isLocalStorage ) {
+export function* apiFlow( api, actionName, { deferred, isLocalStorage }) {
+  const start = isLocalStorage ? localStorageStart : apiStart;
+  const success = isLocalStorage ? localStorageSuccess : apiSuccess;
+  const error = isLocalStorage ? localStorageError : apiError;
 
   let responseData = null;
   const dispatchedActionsTracker = {
@@ -30,22 +37,26 @@ export function* apiFlow( api, actionName, deferred ) {
     },
   };
 
-  const _startedAction = makeAction( apiStart(actionName) );
+  const _startedAction = makeAction( start(actionName) );
   yield put( _startedAction );
   dispatchedActionsTracker.addAction('startAction', _startedAction);
   try {
     responseData = yield call( api );
-    const _successAction = makeAction( apiSuccess(actionName), responseData );
+    const _successAction = makeAction( success(actionName), responseData );
     yield put( _successAction );
     dispatchedActionsTracker.addAction('successAction', _successAction);
-    deferred.resolve(_successAction);
+    if ( deferred ) {
+      deferred.resolve(_successAction);
+    }
   }
   catch ( errorData ) {
-    const _errorAction = makeAction( apiError(actionName), errorData );
+    const _errorAction = makeAction( error(actionName), errorData );
     yield put( _errorAction );
     responseData = errorData;
     dispatchedActionsTracker.addAction('errorAction', _errorAction);
-    deferred.reject(_errorAction);
+    if ( deferred ) {
+      deferred.reject(_errorAction);
+    }
   }
 
   return dispatchedActionsTracker;

@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import lodashFind from 'lodash/find';
 
 import Layout from 'components/Layout';
 import MapManager from 'helpers/MapManager';
@@ -21,20 +22,34 @@ import  {
 
 import {
   ACTION_LOAD_USER,
-  ACTION_LOAD_PAGE,
 } from 'redux-modules/actions/user';
+import {
+  ACTION_LOAD_PLACES,
+} from 'redux-modules/actions/places';
 
 import {
   SIDEBAR_WIDTH,
 } from 'constants';
 
+import {
+  extractPlacesLoadedFromStorage,
+  extractPlaces,
+} from 'redux-modules/reducers/places';
+
 
 @clientEntry()
 @attachRedux()
-@connect()
+@connect(
+  (globalState) => ({
+    placesLoadedFromStorage: extractPlacesLoadedFromStorage(globalState),
+    places: extractPlaces(globalState),
+  })
+)
 class HomePage extends Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
+    placesLoadedFromStorage: PropTypes.bool.isRequired,
+    places: PropTypes.object,
   }
 
   // NOTE: Context object contains:
@@ -76,14 +91,30 @@ class HomePage extends Component {
     MapManager.initializeComplete
       .then(() => {
         this.initializeMap();
+        this.props.dispatch( makeAction(
+          request(ACTION_LOAD_PLACES)
+        ) );
       });
   }
 
-  surroundCurrentPositionWithMarkers = ({ lat, lng }) => {
-    MapManager.attachMarkerToMap({ lat: lat + 0.03, lng });
-    MapManager.attachMarkerToMap({ lat, lng: lng + 0.03 });
-    MapManager.attachMarkerToMap({ lat: lat - 0.03, lng });
-    MapManager.attachMarkerToMap({ lat, lng: lng - 0.03 });
+  componentDidUpdate( prevProps /* , prevState */) {
+    const onPlacesLoaded = ( !prevProps.placesLoadedFromStorage && this.props.placesLoadedFromStorage );
+    if ( onPlacesLoaded ) {
+      this.populatePlacesFromStorage();
+    }
+  }
+
+  populatePlacesFromStorage = () => {
+    Object.keys(this.props.places).forEach(( placeID ) => {
+      const { lat, lng, saved } = this.props.places[placeID];
+      if ( saved ) {
+        MapManager.attachMarkerToMap({
+          lat,
+          lng,
+          saved,
+        });
+      }
+    });
   }
 
   centerMapOnCurrentPosition = () => {
@@ -99,49 +130,65 @@ class HomePage extends Component {
         });
         MapManager.googleMap.setCenter({ lat, lng });
         MapManager.attachMarkerToMap({ lat, lng });
-        this.surroundCurrentPositionWithMarkers({ lat, lng });
       });
   }
 
-  loadPageData = () => {
+  loadUserData = () => {
     this.props.dispatch( makeAction(
-      request(ACTION_LOAD_PAGE)
+      request(ACTION_LOAD_USER)
     ) );
   };
 
+  onPlaceListItemClick = ( event ) => {
+    const placeID = event.currentTarget.getAttribute('data-place-id');
+    const place = this.props.places[placeID];
+    MapManager.googleMap.panTo({
+      lat: place.lat,
+      lng: place.lng,
+    });
+  }
+
   render() {
     const {
-      currentPositionLatLng,
-    } = this.state;
+      places,
+    } = this.props;
+    const hasActivatedPlace = Boolean(lodashFind( places, { saved: true }));
 
     return (
       <div>
         <Layout htmlTitle={'Home'}>
           {/* <MapDevTool /> */}
           <div className="mapSidebar">
-            LeftRegion
+            { hasActivatedPlace &&
+              <div className="placeList">
+                { Object.keys( places ).map(( placeKey ) => {
+                  const place = places[placeKey];
+                  if ( !place.saved ) {
+                    return null;
+                  }
+                  return (
+                    <div
+                      className="placeListItem"
+                      key={place.id}
+                      data-place-id={ place.id }
+                      onClick={this.onPlaceListItemClick}
+                    >
+                      {place.label || place.id}
+                    </div>
+                  );
+                }) }
+              </div>
+            }
+            {/*
+              <button onClick={this.loadUserData} >
+                {'loadUserData'}
+              </button>
+            */}
           </div>
           <div className="mapContent">
-            <div id="mapRegion" className="mapRegion" >
-              { currentPositionLatLng &&
-                <div>
-                  <button
-                    className="centerMap"
-                    onClick={this.centerMapOnCurrentPosition} >
-                    center
-                  </button>
-                  <div className="legend" >
-                    Legend
-                  </div>
-                </div>
-              }
-            </div>
+            {/* Map is inserted here dont put any children */}
+            <div id="mapRegion" className="mapRegion" />
           </div>
-          {/*
-            <div className="mapRegionWrap">
-
-          */}
-
         </Layout>
         <style jsx>{`
           .mapRegionWrap {
@@ -180,6 +227,8 @@ class HomePage extends Component {
             top: 0;
             left: 0;
             bottom: 0;
+            overflow: auto;
+            overflow-x: hidden;
           }
           .mapContent {
             position: absolute;
@@ -187,6 +236,18 @@ class HomePage extends Component {
             left: ${SIDEBAR_WIDTH}px;
             right: 0;
             bottom: 0;
+          }
+          .placeList {
+          }
+          .placeListItem {
+            padding: 10px;
+            border-bottom: solid black 2px;
+            height: 4em;
+            text-overflow: ellipsis;
+          }
+          .placeListItem:hover{
+            background: #EEE;
+            cursor: pointer;
           }
         `}</style>
       </div>

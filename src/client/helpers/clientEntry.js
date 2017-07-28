@@ -3,7 +3,7 @@ import { Component } from 'react';
 import { wrapDisplayName } from 'recompose';
 
 import MapManager from 'helpers/MapManager';
-
+import { initializeLocalStorage } from 'web-api/localStorageMockApi';
 
 let clientEntryRun = false;
 // NOTE: Perform client side initialization here.  This is run once only.
@@ -14,6 +14,7 @@ function clientEntry() {
       lng: -122.291353,
     },
   });
+  initializeLocalStorage();
 }
 
 

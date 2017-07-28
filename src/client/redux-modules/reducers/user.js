@@ -1,29 +1,18 @@
 import {
   ACTION_LOAD_USER,
-  ACTION_LOAD_PAGE,
 } from 'redux-modules/actions/user';
 
 import {
-  apiStart,
   apiSuccess,
-  apiError,
 } from 'helpers/reduxAction';
+
+import metaReducer from 'redux-modules/reducers/meta';
 
 // Store key
 export const STORE_KEY = 'user';
 
-// Initial state
-const initialState = {
-  meta: {
-    loading: false,
-    loaded: false,
-    error: null,
-  },
-  data: {
-    name: null,
-  },
-  pageData: {
-  },
+export const initialState = {
+  name: null,
 };
 
 // Selectors
@@ -32,49 +21,23 @@ export function extractState(globalState) {
 }
 
 // Reducer
-function reducer( state = initialState, action ) {
+function dataReducer( state = initialState, action ) {
+  // const meta = metaReducer( state.meta, action );
   switch ( action.type ) {
-    case apiStart(ACTION_LOAD_USER): {
-      return {
-        ...state,
-        meta: {
-          ...state.meta,
-          loading: true,
-        },
-      };
-    }
     case apiSuccess(ACTION_LOAD_USER): {
-      return {
-        ...state,
-        meta: {
-          ...state.meta,
-          loaded: true,
-          loading: false,
-        },
-        data: action.payload,
-      };
-    }
-    case apiError(ACTION_LOAD_USER): {
-      return {
-        ...state,
-        meta: {
-          ...state.meta,
-          loading: false,
-          error: action.payload,
-        },
-      };
-    }
-
-    case apiSuccess(ACTION_LOAD_PAGE): {
-      return {
-        ...state,
-        pageData: action.payload,
-      };
+      return action.payload;
     }
     default: {
       return state;
     }
   }
+}
+
+function reducer( state = {}, action ) {
+  return {
+    data: dataReducer( state.data, action ),
+    meta: metaReducer( state.meta, action ),
+  };
 }
 
 export default reducer;

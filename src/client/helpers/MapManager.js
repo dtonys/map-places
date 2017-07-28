@@ -58,7 +58,9 @@ const getMapControlOptionsDefault = () => {
   };
 };
 
-const ICON_PATH = '/static/pin_w30.svg';
+export const ICON_PATH = '/static/pin_w30.svg';
+export const ACTIVE_ICON_PATH = '/static/pin_w30_active.svg';
+export const GREYED_ICON_PATH = '/static/pin_w30_greyed.svg';
 
 const MapManager = {
   /** Private members **/
@@ -96,7 +98,7 @@ const MapManager = {
     if ( this.googleMap ) return;
     this.googleMap = new google.maps.Map(this._mapDomNode, { // eslint-disable-line
       center: { lat, lng },
-      zoom: 10,
+      zoom: 11,
       mapTypeId,
       ...getMapControlOptionsDefault(),
     });
@@ -132,7 +134,7 @@ const MapManager = {
     google.maps.event.trigger(this.googleMap, 'resize'); // eslint-disable-line
     return true;
   },
-  attachMarkerToMap: function attachMarkerToMap({ lat, lng }) {
+  attachMarkerToMap: function attachMarkerToMap({ lat, lng, saved }) {
     const latLngUID = `${lat}_${lng}`;
     if ( this.googleMapMarkers[latLngUID] ) {
       return lodashNoOp;
@@ -140,8 +142,11 @@ const MapManager = {
     const marker = new google.maps.Marker({
       position: { lat, lng },
       map: this.googleMap,
-      icon: ICON_PATH,
+      icon: saved ? ICON_PATH : GREYED_ICON_PATH,
     });
+    if ( saved ) {
+      marker.MP_saved = true;
+    }
     marker.addListener('click', () => {
       const latLngFns = marker.getPosition();
       const clickedLat = latLngFns.lat();
