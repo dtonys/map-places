@@ -52,7 +52,6 @@ test.serial('POST `/api/users/create` creates a new user', async (t) => {
     });
   await apiRequest;
 
-
   // const { db, request } = t.context;
   // const User = db.model('user');
   // const user = await User.create({

@@ -4,18 +4,13 @@ import User from 'models/user';
 const debug = require('debug')('mp-user-controller');
 
 export async function create(req, res, next) {
-  console.log('create user');
   debug('create');
   const payload = req.body;
   try {
-    console.log('create user before');
     const user = await User.create(payload);
-    console.log('create user after');
     res.json(user);
   }
   catch (error) {
-    console.log('error');
-    console.log(error);
     next(error);
   }
 }
