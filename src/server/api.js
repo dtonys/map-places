@@ -1,19 +1,24 @@
 import { Router } from 'express';
 
-import * as apiController from 'api-controller';
+import * as placeController from 'controllers/place';
+import * as userController from 'controllers/user';
 
 const router = new Router();
 
-router.get('/user', apiController.loadUser );
-router.get('/page', apiController.loadPageData );
+// USER
+router.post('/api/users', userController.create );
+router.patch('/api/users/:id', userController.update );
+router.put('/api/users/:id', userController.replace );
+router.get('/api/users/:id', userController.get );
+router.get('/api/users', userController.list );
+router.delete('/api/users/:id', userController.remove );
 
-// Places
-router.get('/page', apiController.loadPageData );
-
-router.get('/places', apiController.getPlacesList );
-router.post('/places', apiController.createPlace );
-router.patch('/places/:id', apiController.patchPlace );
-router.get('/places/:id', apiController.getPlace );
-router.delete('/places/:id', apiController.deletePlace );
+// PLACE
+router.post('/api/places', placeController.create );
+router.patch('/api/places/:id', placeController.update );
+router.put('/api/places/:id', placeController.replace );
+router.get('/api/places/:id', placeController.get );
+router.get('/api/places', placeController.list );
+router.delete('/api/places/:id', placeController.remove );
 
 export default router;
