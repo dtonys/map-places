@@ -177,6 +177,7 @@ module.exports = {
     "__CLIENT__": true,
     "__SERVER__": true,
     "__DEVELOPMENT__": true,
+    "__TEST__": true,
     "google": true,
   },
 };

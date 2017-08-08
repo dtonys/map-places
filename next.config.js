@@ -24,6 +24,7 @@ const defineGlobals = Object.assign({}, clientEnvs, {
   __CLIENT__: 'true',
   __SERVER__: 'false',
   __DEVELOPMENT__: process.env.NODE_ENV === 'production' ? 'false' : 'true',
+  __TEST__: process.env.NODE_ENV === 'test' ? 'true' : 'false',
 });
 
 const ANALYZE = process.env.ANALYZE;
@@ -38,7 +39,7 @@ module.exports = {
         analyzerMode: 'server',
         analyzerPort: 8888,
         openAnalyzer: true
-      }))
+      }));
     }
 
     return config;

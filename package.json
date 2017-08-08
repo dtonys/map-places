@@ -4,13 +4,28 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development babel-watch -D --delay 5 -w ./src/common -w ./src/server ./src/server/server.js",
+    "dev": "cross-env NODE_ENV=development DEBUG=mp* babel-watch -D --delay 5 -w ./src/common -w ./src/server ./src/server/server.js",
     "build": "cross-env NODE_ENV=production next build",
     "start": "cross-env NODE_ENV=production forever start --uid map-places --append ./bin/run-server.js",
     "lint-js": "eslint -c ./.eslintrc.js ./bin ./pages ./src",
-    "analyze": "cross-env ANALYZE=1 next build"
+    "analyze": "cross-env ANALYZE=1 next build",
+    "test": "cross-env NODE_ENV=test DEBUG=mp* ava --serial --watch"
+  },
+  "ava": {
+    "require": [
+      "babel-register",
+      "babel-polyfill"
+    ],
+    "babel": "inherit",
+    "files": [
+      "src/server/controllers/tests/user.js"
+    ],
+    "source": [
+      "src/server/*.js"
+    ]
   },
   "dependencies": {
+    "ava": "^0.21.0",
     "babel-loader": "^7.1.1",
     "babel-plugin-dynamic-import-node": "^1.0.2",
     "babel-plugin-module-resolver": "^2.7.1",
@@ -21,11 +36,14 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-1": "^6.24.1",
     "babel-register": "^6.24.1",
+    "body-parser": "^1.17.2",
     "chalk": "^2.0.1",
     "cross-env": "^5.0.1",
+    "debug": "^2.6.8",
     "dotenv": "^4.0.0",
     "express": "^4.15.3",
     "lodash": "^4.17.4",
+    "mongoose": "^4.11.5",
     "next": "^2.4.7",
     "next-routes": "^1.0.40",
     "npm-run-all": "^4.0.2",
@@ -55,7 +73,9 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-react": "^7.1.0",
+    "mongomem": "^0.1.9",
     "redux-logger": "^3.0.6",
-    "redux-node-logger": "^0.1.0"
+    "redux-node-logger": "^0.1.0",
+    "supertest": "^3.0.0"
   }
 }
