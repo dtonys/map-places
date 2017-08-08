@@ -8,6 +8,7 @@ export async function create( req, res, next ) {
   const payload = req.body;
   try {
     const place = await Place.create(payload);
+    console.log('create success');
     res.json(place);
   }
   catch (error) {

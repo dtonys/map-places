@@ -4,7 +4,7 @@ import supertest from 'supertest';
 
 import {
   nextMock,
-} from 'helpers/test'
+} from 'helpers/test';
 import {
   registerMongooseModels,
   setupTestMongoose,
@@ -14,12 +14,12 @@ import {
 } from 'helpers/express';
 
 
-test.before('start mongodb memory server', async (t) => {
+test.before('start mongodb memory server', async () => {
   await MongoDBServer.start();
 });
 
 test.beforeEach('setup mongoose and express', async (t) => {
-  const expressApp = await createExpressApp( nextMock )
+  const expressApp = await createExpressApp( nextMock );
   const request = supertest(expressApp);
   registerMongooseModels();
   const db = await setupTestMongoose();
@@ -64,8 +64,3 @@ test.serial('POST `/api/users/create` creates a new user', async (t) => {
   // t.is( user.first_name, queriedUser.first_name, 'should be able to save a new user' );
   // t.pass();
 });
-
-
-
-
-

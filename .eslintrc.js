@@ -57,7 +57,7 @@ module.exports = {
     "linebreak-style": [ "warn", "unix" ],
     "no-multiple-empty-lines": [ "warn", { "max": 2, "maxEOF": 1 } ],
     "eol-last": [ "error", "unix" ],
-    "id-length": [ "warn", { "min": 2, "exceptions": [ "_", "$", "i", "j", "k", "x", "y", "e" ] } ],
+    "id-length": [ "warn", { "min": 2, "exceptions": [ "_", "$", "i", "j", "k", "x", "y", "e", "t" ] } ],
     "camelcase": "warn",
     "func-names": "warn",
     "keyword-spacing": "warn",

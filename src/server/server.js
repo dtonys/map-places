@@ -18,7 +18,7 @@ debug('Starting server promise chain: ');
 Promise.resolve()
   .then(() => {
     registerMongooseModels();
-    return setupMongoose();
+    return setupMongoose('mapplaces');
   })
   .then(() => {
     return createExpressApp( next );
