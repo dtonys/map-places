@@ -19,7 +19,7 @@
     ],
     "babel": "inherit",
     "files": [
-      "src/server/controllers/tests/user.js"
+      "src/server/controllers/tests/*.js"
     ],
     "source": [
       "src/server/**/*.js"

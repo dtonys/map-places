@@ -17,6 +17,8 @@ export const WEB_API_ERROR_TYPES = [
 ];
 
 
+const debug = require('debug')('mp-webApiRequest');
+
 function webApiHandleError( networkError, response, responseBody ) {
   // No `networkError` or `response`. This should not happen. Report unexpected error.
   if ( !networkError && !response ) {
@@ -39,7 +41,6 @@ function webApiHandleError( networkError, response, responseBody ) {
     let error = {
       webApiErrorType: RESPONSE_BODY_PARSE_FAIL_ERROR,
     };
-    console.log(response);
     if ( response.text ) {
       error = {
         ...error,
@@ -77,6 +78,7 @@ export default function webApiRequest( method, path, params) {
       updatedPath = `http://localhost:${port}${path}`;
     }
 
+    debug(`${method} : ${updatedPath}`);
     const request = superagent( method, updatedPath);
     // NOTE: Disable error on HTTP 4xx or 5xx. This means:
     // - `networkError` will only be populated if `resonse.text` is falsey

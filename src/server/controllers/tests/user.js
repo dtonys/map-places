@@ -87,9 +87,9 @@ test.serial('GET `/api/users/:id` gets a user', async (t) => {
   const response = await webApiRequest(
     'GET', `/api/users/${createdUser._id.toString()}`
   );
-  const queriedUser = await User.findOne({ _id: response._id });
-
   t.is(response.first_name, testUserPayload.first_name, 'response shows the updates');
+
+  const queriedUser = await User.findOne({ _id: response._id });
   t.is(queriedUser.first_name, testUserPayload.first_name, 'database shows the updates');
 });
 

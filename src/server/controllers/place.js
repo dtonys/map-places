@@ -21,7 +21,11 @@ export async function update( req, res, next ) {
   const id = req.params.id;
 
   try {
-    const updatedPlace = await Place.findByIdAndUpdate(id, payload);
+    await Place.update(
+      { _id: id },
+      payload
+    );
+    const updatedPlace = await Place.findById(id);
     res.json(updatedPlace);
     return;
   }
@@ -57,7 +61,7 @@ export async function remove( req, res, next ) {
   debug('delete');
   const id = req.params.id;
   try {
-    await Place.findOneAndRemove({ _id: id });
+    const response = await Place.findOneAndRemove({ _id: id });
     res.json({
       success: true,
     });
