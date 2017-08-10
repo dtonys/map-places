@@ -2,28 +2,11 @@ import fs from 'fs';
 import path from 'path';
 
 import mongoose from 'mongoose';
-import { MongoDBServer } from 'mongomem';
 
 
 const debug = require('debug')('mp-helpers-mongo');
 
-export async function setupTestMongoose() {
-  const db = new mongoose.Mongoose();
-  const connectionString = await MongoDBServer.getConnectionString();
-  await db.connect(connectionString, {
-    useMongoClient: true,
-    promiseLibrary: global.Promise,
-    config: {
-      autoIndex: true,
-    },
-  });
-  for (const name of mongoose.modelNames()) {
-    db.model(name, mongoose.model(name).schema);
-  }
-  return db;
-}
-
-export function registerMongooseModels() {
+function registerMongooseModels() {
   // Load all models into mongoose
   const modelAndSchemaFiles = fs.readdirSync( path.resolve(__dirname, '../models') );
   modelAndSchemaFiles.forEach((file) => {
@@ -31,12 +14,23 @@ export function registerMongooseModels() {
   });
 }
 
-export function setupMongoose(db_name) {
+export function buildAllIndexes() {
+  const db = mongoose.connection;
+  const buildIndexPromises = Object.keys(db.models).map(( model ) => {
+    return db.models[model].ensureIndexes();
+  });
+  return Promise.all(buildIndexPromises);
+}
+
+export function setupMongoose(dbName) {
   debug('setupMongoose');
+  mongoose.set('debug', true);
   mongoose.Promise = global.Promise;
 
+  registerMongooseModels();
+
   return new Promise(( resolve, reject ) => {
-    const connection = mongoose.connect(`mongodb://localhost/${db_name}`, {
+    const connection = mongoose.connect(`mongodb://localhost/${dbName}`, {
       useMongoClient: true,
       promiseLibrary: global.Promise,
       config: {

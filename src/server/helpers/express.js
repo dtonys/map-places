@@ -34,11 +34,6 @@ export async function createExpressApp( next ) {
   const handler = pageRoutes.getRequestHandler(app);
 
   const server = express();
-
-  server.use((req, res, next) => {
-    console.log(req.originalUrl);
-    next();
-  });
   server.use(favicon(path.resolve(__dirname, '../../../static/favicon.ico')));
   server.use(bodyParser.json());
   server.use(bodyParser.urlencoded({ extended: true }));

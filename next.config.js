@@ -38,7 +38,7 @@ module.exports = {
       config.plugins.push(new BundleAnalyzerPlugin({
         analyzerMode: 'server',
         analyzerPort: 8888,
-        openAnalyzer: true
+        openAnalyzer: true,
       }));
     }
 

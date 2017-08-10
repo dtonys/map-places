@@ -9,7 +9,8 @@
     "start": "cross-env NODE_ENV=production forever start --uid map-places --append ./bin/run-server.js",
     "lint-js": "eslint -c ./.eslintrc.js ./bin ./pages ./src",
     "analyze": "cross-env ANALYZE=1 next build",
-    "test": "cross-env NODE_ENV=test DEBUG=mp* ava --serial --watch"
+    "test": "cross-env NODE_ENV=test DEBUG=mp* ava --serial --watch --verbose",
+    "console": "cross-env DEBUG=mp* babel-node ./bin/run-console.js"
   },
   "ava": {
     "require": [
@@ -21,7 +22,7 @@
       "src/server/controllers/tests/user.js"
     ],
     "source": [
-      "src/server/*.js"
+      "src/server/**/*.js"
     ]
   },
   "dependencies": {

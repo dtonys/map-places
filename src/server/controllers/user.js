@@ -32,24 +32,6 @@ export async function update(req, res, next) {
   }
 }
 
-export async function replace(req, res, next ) {
-  debug('replace');
-
-  const payload = req.body;
-  const id = req.params.id;
-  try {
-    await User.replaceOne(
-      { _id: id },
-      payload
-    );
-    const updatedUser = await User.findById(id);
-    res.json(updatedUser);
-  }
-  catch (error) {
-    next(error);
-  }
-}
-
 export async function get(req, res, next ) {
   debug('get');
   const id = req.params.id;

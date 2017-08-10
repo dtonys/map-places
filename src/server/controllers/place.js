@@ -8,7 +8,6 @@ export async function create( req, res, next ) {
   const payload = req.body;
   try {
     const place = await Place.create(payload);
-    console.log('create success');
     res.json(place);
   }
   catch (error) {
@@ -20,30 +19,11 @@ export async function update( req, res, next ) {
   debug('update');
   const payload = req.body;
   const id = req.params.id;
-  try {
-    await Place.update(
-      { _id: id },
-      payload,
-    );
-    const updatedPlace = await Place.findById(id);
-    res.json(updatedPlace);
-  }
-  catch (error) {
-    next(error);
-  }
-}
 
-export async function replace( req, res, next ) {
-  debug('replace');
-  const payload = req.body;
-  const id = req.params.id;
   try {
-    await Place.replaceOne(
-      { _id: id },
-      payload
-    );
-    const updatedPlace = await Place.findById(id);
+    const updatedPlace = await Place.findByIdAndUpdate(id, payload);
     res.json(updatedPlace);
+    return;
   }
   catch (error) {
     next(error);

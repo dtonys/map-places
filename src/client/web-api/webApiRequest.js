@@ -1,6 +1,7 @@
 import superagent from 'superagent';
 import {
   APP_PORT,
+  TEST_PORT,
 } from 'constants';
 
 export const UNKNOWN_ERROR = 'UNKNOWN_ERROR';
@@ -38,6 +39,13 @@ function webApiHandleError( networkError, response, responseBody ) {
     let error = {
       webApiErrorType: RESPONSE_BODY_PARSE_FAIL_ERROR,
     };
+    console.log(response);
+    if ( response.text ) {
+      error = {
+        ...error,
+        responseText: response.text,
+      };
+    }
     if ( response.error ) {
       error = {
         ...error,
@@ -63,8 +71,10 @@ function webApiHandleError( networkError, response, responseBody ) {
 export default function webApiRequest( method, path, params) {
   return new Promise(( resolve, reject ) => {
     let updatedPath = path;
+
     if ( __SERVER__ ) {
-      updatedPath = `http://localhost:${APP_PORT}${path}`;
+      const port = __TEST__ ? TEST_PORT : APP_PORT;
+      updatedPath = `http://localhost:${port}${path}`;
     }
 
     const request = superagent( method, updatedPath);

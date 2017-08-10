@@ -1,7 +1,6 @@
 import next from 'next';
 import {
   setupMongoose,
-  registerMongooseModels,
 } from 'helpers/mongo';
 import {
   startExpressServer,
@@ -10,26 +9,12 @@ import {
 import loadEnv from './loadEnv';
 
 
-const debug = require('debug')('mp-server');
+async function bootstrap() {
+  loadEnv();
+  await setupMongoose('mapplaces');
+  const expressApp = await createExpressApp(next);
+  const serverListener = await startExpressServer(expressApp);
+  console.log(`Server ready on http://localhost:${serverListener.address().port}`);  // eslint-disable-line no-console
+}
 
-loadEnv();
-
-debug('Starting server promise chain: ');
-Promise.resolve()
-  .then(() => {
-    registerMongooseModels();
-    return setupMongoose('mapplaces');
-  })
-  .then(() => {
-    return createExpressApp( next );
-  })
-  .then(( expressApp ) => {
-    return startExpressServer(expressApp);
-  })
-  .then(( listener ) => {
-    console.log(`> Ready on http://localhost:${listener.address().port}`); // eslint-disable-line no-console
-  })
-  .catch(( err ) => {
-    console.log('Server startup error: '); // eslint-disable-line no-console
-    console.log(err); // eslint-disable-line no-console
-  });
+bootstrap();
