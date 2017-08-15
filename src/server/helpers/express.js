@@ -1,9 +1,11 @@
 import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import favicon from 'serve-favicon';
 import pageRoutes from 'routes/pageRoutes';
 import api from 'api';
+
 
 import {
   APP_PORT,
@@ -35,8 +37,11 @@ export async function createExpressApp( next ) {
 
   const server = express();
   server.use(favicon(path.resolve(__dirname, '../../../static/favicon.ico')));
+  server.use(cookieParser());
   server.use(bodyParser.json());
   server.use(bodyParser.urlencoded({ extended: true }));
+  // Session middleware
+
   // API server
   server.use(api);
   // NextJS handled routes
@@ -49,4 +54,3 @@ export async function createExpressApp( next ) {
 
   return server;
 }
-

@@ -5,7 +5,7 @@ import * as userController from 'controllers/user';
 
 const router = new Router();
 
-// USER
+// CRUD USER
 router.post('/api/users', userController.create );
 router.patch('/api/users/:id', userController.update );
 router.put('/api/users/:id', userController.update );
@@ -13,12 +13,19 @@ router.get('/api/users/:id', userController.get );
 router.get('/api/users', userController.list );
 router.delete('/api/users/:id', userController.remove );
 
-// PLACE
+// Session
+router.post('/api/signup', userController.signup);
+router.post('/api/login', userController.login);
+router.get('/api/logout', userController.logout);
+router.get('/api/session/info', userController.sessionInfo);
+
+// CRUD PLACE
 router.post('/api/places', placeController.create );
 router.patch('/api/places/:id', placeController.update );
 router.put('/api/places/:id', placeController.update );
 router.get('/api/places/:id', placeController.get );
 router.get('/api/places', placeController.list );
 router.delete('/api/places/:id', placeController.remove );
+
 
 export default router;

@@ -18,6 +18,7 @@ const UserSchema = new Schema({
   },
   is_email_verified: {
     type: Boolean,
+    default: false,
   },
 });
 

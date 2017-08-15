@@ -1,6 +1,9 @@
 import path from 'path';
 
 import dotenv from 'dotenv';
+import {
+  createSessionEncryptor,
+} from 'helpers/session';
 
 
 export default function loadEnv() {
@@ -20,6 +23,8 @@ export default function loadEnv() {
     __DEVELOPMENT__: !(process.env.NODE_ENV === 'production'),
     __TEST__: process.env.NODE_ENV === 'test',
   });
+
+  createSessionEncryptor();
 
   // Attach to nodejs global object
   if ( envs && envs.parsed ) {

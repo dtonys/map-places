@@ -8,7 +8,6 @@ import {
 } from 'helpers/express';
 import loadEnv from './loadEnv';
 
-
 async function bootstrap() {
   loadEnv();
   await setupMongoose('mapplaces');

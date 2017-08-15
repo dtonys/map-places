@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 const debug = require('debug')('mp-helpers-mongo');
 
 function registerMongooseModels() {
+  debug('registerMongooseModels');
   // Load all models into mongoose
   const modelAndSchemaFiles = fs.readdirSync( path.resolve(__dirname, '../models') );
   modelAndSchemaFiles.forEach((file) => {
@@ -15,6 +16,7 @@ function registerMongooseModels() {
 }
 
 export function buildAllIndexes() {
+  debug('buildAllIndexes');
   const db = mongoose.connection;
   const buildIndexPromises = Object.keys(db.models).map(( model ) => {
     return db.models[model].ensureIndexes();
