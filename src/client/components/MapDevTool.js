@@ -2,7 +2,7 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  BASIC_MAP_TYPES
+  BASIC_MAP_TYPES,
 } from 'helpers/MapManager';
 
 class MapDevTool extends Component {
@@ -28,7 +28,8 @@ class MapDevTool extends Component {
     });
 
     if ( inputKey === 'mapTypeId' ) {
-      MapManager.googleMap.setMapTypeId(value);
+      // TODO: Implement
+      // MapManager.googleMap.setMapTypeId(value);
     }
   }
 
