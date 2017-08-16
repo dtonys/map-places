@@ -5,6 +5,25 @@ export async function loadUserApi() {
   return response.data;
 }
 
+export async function loginApi( payload ) {
+  const response = await webApiRequest(
+    'POST', '/api/login', {
+      body: payload,
+    }
+  );
+  return response;
+}
+
+export async function signupApi( payload ) {
+  const response = await webApiRequest(
+    'POST', '/api/signup', {
+      body: payload,
+    }
+  );
+  return response;
+}
+
+
 export async function loadPageDataApi() {
   const response = await webApiRequest('GET', '/api/page');
   return response.data;
