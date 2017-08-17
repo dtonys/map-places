@@ -18,7 +18,9 @@ export async function create(req, res, next) {
   const payload = req.body;
   try {
     const user = await User.create(payload);
-    res.json(user);
+    res.json({
+      data: user,
+    });
   }
   catch (error) {
     next(error);
@@ -35,7 +37,9 @@ export async function update(req, res, next) {
       payload,
     );
     const updatedUser = await User.findById(id);
-    res.json(updatedUser);
+    res.json({
+      data: updatedUser,
+    });
   }
   catch (error) {
     next(error);
@@ -47,7 +51,9 @@ export async function get(req, res, next ) {
   const id = req.params.id;
   try {
     const user = await User.findById(id);
-    res.json(user);
+    res.json({
+      data: user,
+    });
   }
   catch (error) {
     next(error);
@@ -58,6 +64,11 @@ export async function list(req, res, next ) {
   debug('list');
   try {
     const users = await User.find();
+    res.json({
+      data: {
+        items: users,
+      },
+    });
     res.json(users);
   }
   catch (error) {
@@ -71,7 +82,7 @@ export async function remove(req, res, next ) {
   try {
     await User.findOneAndRemove({ _id: id });
     res.json({
-      success: true,
+      data: null,
     });
   }
   catch (error) {
@@ -91,10 +102,12 @@ export async function signup( req, res, next ) {
   // check if user already exists with email
   const existingUser = await User.findOne({ email: email });
   if ( existingUser ) {
-    // Existing user error
+    res.status(422);
     res.json({
-      success: false,
-      message: 'existing user error',
+      error: [ {
+        code: 'EXISTING_RESOURCE',
+        message: 'User email already in use',
+      } ],
     });
     return;
   }
@@ -109,7 +122,9 @@ export async function signup( req, res, next ) {
       password_hash: passwordHash,
     });
     // return user
-    res.json(user);
+    res.json({
+      data: user,
+    });
     return;
   }
   catch ( error ) {
@@ -139,22 +154,26 @@ export async function login(req, res, next) {
         }
         // login success
         res.json({
-          success: true,
-          message: 'login success',
+          data: user,
         });
         return;
       }
       // wrong password
+      res.status(422);
       res.json({
-        success: false,
-        message: 'Invalid email and password combination ( wrong password )',
+        error: [ {
+          code: '',
+          message: 'Wrong password',
+        } ],
       });
       return;
     }
     // user not found
     res.json({
-      success: false,
-      message: 'Invalid email and password combination ( user not found )',
+      error: [ {
+        code: 'NOT_FOUND',
+        message: 'User not found',
+      } ],
     });
     return;
   }
@@ -170,6 +189,10 @@ export async function logout(req, res, next) {
     try {
       await deleteSession(sessionId);
       res.clearCookie(SESSION_COOKIE_NAME);
+      res.json({
+        data: null,
+      });
+      return;
     }
     catch ( error ) {
       next(error);
@@ -177,7 +200,7 @@ export async function logout(req, res, next) {
     }
   }
   res.json({
-    success: true,
+    data: null,
   });
 }
 
@@ -186,28 +209,25 @@ export async function sessionInfo(req, res, next) {
   const sessionId = req.cookies[SESSION_COOKIE_NAME];
   if ( !sessionId ) {
     res.json({
-      session: null,
-      user: null,
-      success: false,
-      message: 'No active session',
+      data: null,
     });
     return;
   }
   const { user, session } = await getCurrentSessionAndUser( sessionId );
   if ( !user || !session ) {
     res.json({
-      session: null,
-      user: null,
-      success: false,
-      message: 'No active session',
+      data: null,
     });
     return;
   }
   try {
     res.json({
-      user,
-      session,
+      data: {
+        currentUser: user,
+        currentSession: session,
+      },
     });
+    return;
   }
   catch ( error ) {
     next(error);

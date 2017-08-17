@@ -8,7 +8,9 @@ export async function create( req, res, next ) {
   const payload = req.body;
   try {
     const place = await Place.create(payload);
-    res.json(place);
+    res.json({
+      data: place,
+    });
   }
   catch (error) {
     next(error);
@@ -26,7 +28,9 @@ export async function update( req, res, next ) {
       payload
     );
     const updatedPlace = await Place.findById(id);
-    res.json(updatedPlace);
+    res.json({
+      data: updatedPlace,
+    });
     return;
   }
   catch (error) {
@@ -39,7 +43,9 @@ export async function get( req, res, next ) {
   const id = req.params.id;
   try {
     const place = await Place.findById(id);
-    res.json(place);
+    res.json({
+      data: place,
+    });
   }
   catch (error) {
     next(error);
@@ -50,7 +56,9 @@ export async function list( req, res, next ) {
   debug('list');
   try {
     const places = await Place.find();
-    res.json(places);
+    res.json({
+      data: { items: places },
+    });
   }
   catch (error) {
     next(error);
@@ -61,9 +69,9 @@ export async function remove( req, res, next ) {
   debug('delete');
   const id = req.params.id;
   try {
-    const response = await Place.findOneAndRemove({ _id: id });
+    await Place.findOneAndRemove({ _id: id });
     res.json({
-      success: true,
+      data: null,
     });
   }
   catch (error) {

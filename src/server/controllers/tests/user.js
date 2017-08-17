@@ -51,9 +51,9 @@ test.serial('POST `/api/users` creates a new user', async (t) => {
       body: testUserPayload,
     }
   );
-  t.is(response.first_name, testUserPayload.first_name, 'response contains created user');
+  t.is(response.data.first_name, testUserPayload.first_name, 'response contains created user');
 
-  const queriedUser = await User.findOne({ _id: response._id });
+  const queriedUser = await User.findOne({ _id: response.data._id });
   t.is(queriedUser.first_name, testUserPayload.first_name, 'database contains created user');
 });
 
@@ -72,9 +72,9 @@ test.serial('PATCH `/api/users/:id` updates a user', async (t) => {
       body: updates,
     },
   );
-  t.is(response.first_name, updates.first_name, 'response shows the updates');
+  t.is(response.data.first_name, updates.first_name, 'response shows the updates');
 
-  const queriedUser = await User.findOne({ _id: response._id });
+  const queriedUser = await User.findOne({ _id: response.data._id });
   t.is(queriedUser.first_name, updates.first_name, 'database shows the updates');
 });
 
@@ -88,9 +88,9 @@ test.serial('GET `/api/users/:id` gets a user', async (t) => {
   const response = await webApiRequest(
     'GET', `/api/users/${createdUser._id.toString()}`
   );
-  t.is(response.first_name, testUserPayload.first_name, 'response shows the updates');
+  t.is(response.data.first_name, testUserPayload.first_name, 'response shows the updates');
 
-  const queriedUser = await User.findOne({ _id: response._id });
+  const queriedUser = await User.findOne({ _id: response.data._id });
   t.is(queriedUser.first_name, testUserPayload.first_name, 'database shows the updates');
 });
 
@@ -112,11 +112,11 @@ test.serial('GET `/api/users` gets a list of users', async (t) => {
   const response = await webApiRequest(
     'GET', '/api/users'
   );
-  t.true( response.length === 2, 'response contains multiple elements');
+  t.true( response.data.items.length === 2, 'response contains multiple elements');
   t.truthy(
-    ( response[0].first_name &&
-      response[0].last_name &&
-      response[0].email
+    ( response.data.items[0].first_name &&
+      response.data.items[0].last_name &&
+      response.data.items[0].email
     ), 'The elements are of the model type'
   );
   const users = await User.find();
@@ -135,7 +135,7 @@ test.serial('DELETE `/api/users/:id` deletes a user', async (t) => {
   const response = await webApiRequest(
     'DELETE', `/api/users/${user._id.toString()}`
   );
-  t.true( response.success === true, 'delete response shows success flag' );
+  t.true( response.data === null, 'delete response has null data' );
   const queriedUser = await User.findOne({ _id: user._id.toString() });
   t.true( queriedUser === null, 'database cannot get the deleted user');
 });
