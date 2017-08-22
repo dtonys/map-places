@@ -21,6 +21,7 @@ function reducer( state = initialState, action ) {
       ...state,
       loaded: true,
       loading: false,
+      error: null,
     };
   }
   if ( ~actionSuffix.toLowerCase().indexOf('error') ) {

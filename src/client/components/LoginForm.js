@@ -7,6 +7,7 @@ import {
 import { compose } from 'recompose';
 import {
   required as requiredValidator,
+  email as emailValidator,
   createValidator,
 } from 'mp-validation';
 import TextInput from 'components/TextInput';
@@ -14,6 +15,7 @@ import TextInput from 'components/TextInput';
 
 const LoginFormView = ({
   handleSubmit,
+  serverErrorMessage,
 }) => {
   return (
     <div className="formWrap">
@@ -25,6 +27,11 @@ const LoginFormView = ({
       >
         <h3> Login </h3>
         <fieldset>
+          { serverErrorMessage &&
+            <div className="error" style={{ marginBottom: '10px' }} >
+              {serverErrorMessage}
+            </div>
+          }
           <ReduxFormField
             component={TextInput}
             label="Email"
@@ -58,13 +65,14 @@ const LoginFormView = ({
 };
 LoginFormView.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  serverErrorMessage: PropTypes.string,
 };
 
 const LoginForm = compose(
   reduxForm({
     form: 'login',
     validate: createValidator({
-      email: [ requiredValidator ],
+      email: [ requiredValidator, emailValidator ],
       password: [ requiredValidator ],
     }),
   })

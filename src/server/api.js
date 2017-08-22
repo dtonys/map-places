@@ -5,6 +5,23 @@ import * as userController from 'controllers/user';
 
 const router = new Router();
 
+// debug middleware
+// router.use( ( req, res, next ) => {
+//   console.log('req.protocol');
+//   console.log(req.protocol);
+
+//   console.log('req.host');
+//   console.log(req.host);
+
+//   console.log('req.headers');
+//   console.log(JSON.stringify(req.headers));
+
+//   console.log('req.get(\'host\')');
+//   console.log(req.get('host'));
+
+//   next();
+// });
+
 // CRUD USER
 router.post('/api/users', userController.create );
 router.patch('/api/users/:id', userController.update );

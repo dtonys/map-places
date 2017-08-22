@@ -2,10 +2,10 @@
 import nextRoutes from 'next-routes';
 
 const routes = nextRoutes();
-
 routes
   // NOTE: Route label cannot include "/"
   // .add( [route-label], [route-url], [page-name]);
   .add('users', '/users/:id');
 
+export const Router = routes.Router;
 export default routes;

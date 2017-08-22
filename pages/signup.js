@@ -13,6 +13,7 @@ import {
 } from 'redux-modules/actions/user';
 import SignupForm from 'components/SignupForm';
 
+
 @clientEntry()
 @attachRedux()
 @connect()
@@ -25,13 +26,18 @@ class SignupPage extends Component {
   submitSignup = ( values ) => {
     alert( JSON.stringify( values, null, 2 ));
 
-    this.props.dispatch( makeAction(
-      request(ACTION_SIGNUP),
-      {
+    const signupPromise = this.props.dispatch( makeAction(
+      request(ACTION_SIGNUP), {
         email: values.email,
         password: values.password,
-      }
+      },
+      null,
+      { deferred: true }
     ) );
+    signupPromise.then(() => {
+      // Redirect to home page
+      alert('signup Promise resolved');
+    });
   }
 
   render() {

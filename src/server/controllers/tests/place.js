@@ -13,7 +13,7 @@ import {
   createExpressApp,
   startExpressServer,
 } from 'helpers/express';
-import webApiRequest from 'web-api/webApiRequest';
+import createWebApiRequest from 'web-api/webApiRequest';
 import loadEnv from '../../loadEnv';
 
 
@@ -25,7 +25,7 @@ test.before('Bootstrap application in test mode', async () => {
   console.log(`Server ready on http://localhost:${serverListener.address().port}`); // eslint-disable-line no-console
 });
 
-test.beforeEach('Clear database state before each test', async (/* t */) => {
+test.beforeEach('Clear database state before each test', async ( t ) => {
   const db = mongoose.connection;
   for ( const collectionName of Object.keys(db.collections) ) {
     try {
@@ -37,9 +37,11 @@ test.beforeEach('Clear database state before each test', async (/* t */) => {
 
   }
   await buildAllIndexes();
+  t.context.webApiRequest = createWebApiRequest();
 });
 
 test.serial('POST `/api/places` creates a new place', async (t) => {
+  const { webApiRequest }  = t.context;
   const testPlacePayload = {
     coordinates: [
       100.01,
@@ -57,7 +59,9 @@ test.serial('POST `/api/places` creates a new place', async (t) => {
   const queriedPlace = await Place.findOne({ _id: response.data._id });
   t.is(queriedPlace.name, testPlacePayload.name, 'response contains created place');
 });
+
 test.serial('PATCH `/api/places/:id` updates a place', async (t) => {
+  const { webApiRequest }  = t.context;
   const testPlacePayload = {
     coordinates: [
       100.01,
@@ -79,7 +83,9 @@ test.serial('PATCH `/api/places/:id` updates a place', async (t) => {
   const queriedUser = await Place.findOne({ _id: response.data._id });
   t.is(queriedUser.name, response.data.name, 'database shows updates');
 });
+
 test.serial('GET `/api/places/:id` gets a place', async (t) => {
+  const { webApiRequest }  = t.context;
   const testPlacePayload = {
     coordinates: [
       100.01,
@@ -98,6 +104,7 @@ test.serial('GET `/api/places/:id` gets a place', async (t) => {
 });
 
 test.serial('GET `/api/places` gets a list of places', async (t) => {
+  const { webApiRequest }  = t.context;
   const testPlacePayload1 = {
     coordinates: [
       100.01,
@@ -131,6 +138,7 @@ test.serial('GET `/api/places` gets a list of places', async (t) => {
 });
 
 test.serial('DELETE `/api/places/:id` deletes a place', async (t) => {
+  const { webApiRequest }  = t.context;
   const testPlacePayload = {
     coordinates: [
       100.01,

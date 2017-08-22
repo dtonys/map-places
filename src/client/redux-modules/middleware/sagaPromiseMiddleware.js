@@ -2,8 +2,6 @@
 // It can be used where the local promise callback is convenient
 // See: https://github.com/redux-saga/redux-saga/issues/697
 
-export const DEFERRED = Symbol('DEFERRED');
-
 const createExposedPromise = () => {
   const deferred = {};
 
@@ -16,11 +14,11 @@ const createExposedPromise = () => {
 };
 
 export default store => next => action => {
-  if (!action[DEFERRED]) {
+  if ( !(action.meta && action.meta.deferred) ) {
     return next(action);
   }
 
   const [ promise, deferred ] = createExposedPromise();
-  next({ ...action, [DEFERRED]: deferred });
+  next({ ...action, deferred });
   return promise;
 };

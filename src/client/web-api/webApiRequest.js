@@ -8,6 +8,7 @@ export const UNKNOWN_ERROR = 'UNKNOWN_ERROR';
 export const NETWORK_ERROR = 'NETWORK_ERROR';
 export const RESPONSE_BODY_PARSE_FAIL_ERROR = 'RESPONSE_BODY_PARSE_FAIL';
 export const HTTP_STATUS_ERROR = 'HTTP_STATUS_ERROR';
+export const SERVER_VALIDATION_ERROR = 'SERVER_VALIDATION_ERROR';
 
 export const WEB_API_ERROR_TYPES = [
   UNKNOWN_ERROR,
@@ -60,6 +61,16 @@ function webApiHandleError( networkError, response, responseBody ) {
     return error;
   }
   if ( response.status >= 400 ) {
+    if ( ( response.status === 422 || response.status === 404 ) &&
+      responseBody.error &&
+      responseBody.error[0]
+    ) {
+      // Give the error straight to the redux store
+      return {
+        webApiErrorType: SERVER_VALIDATION_ERROR,
+        ...responseBody.error[0],
+      };
+    }
     const error = {
       webApiErrorType: HTTP_STATUS_ERROR,
       ...responseBody,
@@ -69,13 +80,11 @@ function webApiHandleError( networkError, response, responseBody ) {
   return false;
 }
 
-export default function webApiRequest( method, path, params) {
+function webApiRequest( req, method, path, params = {} ) {
   return new Promise(( resolve, reject ) => {
     let updatedPath = path;
-
     if ( __SERVER__ ) {
-      const port = __TEST__ ? TEST_PORT : APP_PORT;
-      updatedPath = `http://localhost:${port}${path}`;
+      updatedPath = `${req.protocol}://${req.get('host')}${path}`;
     }
 
     debug(`${method} : ${updatedPath}`);
@@ -84,6 +93,15 @@ export default function webApiRequest( method, path, params) {
     // - `networkError` will only be populated if `resonse.text` is falsey
     // - Only one of `networkError` or `response` will be set in the callback, never both.
     request.ok((response) => Boolean(response && response.text) );
+
+    // Transfer cookies from the client to the API, for page loads invoking server rendered API calls.
+    if ( __SERVER__ ) {
+      const cookieHeader = req.headers.cookie;
+      if (cookieHeader) {
+        request.set('cookie', cookieHeader);
+      }
+    }
+
 
     if ( params && params.query ) {
       request.query(params.query);
@@ -116,3 +134,8 @@ export default function webApiRequest( method, path, params) {
     });
   });
 }
+
+export default function createWebApiRequest( req ) {
+  return webApiRequest.bind(null, req);
+}
+

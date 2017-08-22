@@ -14,7 +14,7 @@ import {
   createExpressApp,
   startExpressServer,
 } from 'helpers/express';
-import webApiRequest from 'web-api/webApiRequest';
+import createWebApiRequest from 'web-api/webApiRequest';
 import loadEnv from '../../loadEnv';
 
 
@@ -26,7 +26,7 @@ test.before('Bootstrap application in test mode', async () => {
   console.log(`Server ready on http://localhost:${serverListener.address().port}`); // eslint-disable-line no-console
 });
 
-test.beforeEach('Clear database state before each test', async (/* t */) => {
+test.beforeEach('Clear database state before each test', async ( t ) => {
   const db = mongoose.connection;
   for ( const collectionName of Object.keys(db.collections) ) {
     try {
@@ -38,9 +38,11 @@ test.beforeEach('Clear database state before each test', async (/* t */) => {
 
   }
   await buildAllIndexes();
+  t.context.webApiRequest = createWebApiRequest();
 });
 
 test.serial('POST `/api/users` creates a new user', async (t) => {
+  const { webApiRequest }  = t.context;
   const testUserPayload = {
     first_name: 'created_first',
     last_name: 'created_last',
@@ -58,6 +60,7 @@ test.serial('POST `/api/users` creates a new user', async (t) => {
 });
 
 test.serial('PATCH `/api/users/:id` updates a user', async (t) => {
+  const { webApiRequest }  = t.context;
   const testUserPayload = {
     first_name: 'original_first',
     last_name: 'original_last',
@@ -79,6 +82,7 @@ test.serial('PATCH `/api/users/:id` updates a user', async (t) => {
 });
 
 test.serial('GET `/api/users/:id` gets a user', async (t) => {
+  const { webApiRequest }  = t.context;
   const testUserPayload = {
     first_name: 'get_first',
     last_name: 'get_last',
@@ -95,6 +99,7 @@ test.serial('GET `/api/users/:id` gets a user', async (t) => {
 });
 
 test.serial('GET `/api/users` gets a list of users', async (t) => {
+  const { webApiRequest }  = t.context;
   const testUserPayload1 = {
     first_name: '1_first',
     last_name: '1_last',
@@ -124,6 +129,7 @@ test.serial('GET `/api/users` gets a list of users', async (t) => {
 });
 
 test.serial('DELETE `/api/users/:id` deletes a user', async (t) => {
+  const { webApiRequest }  = t.context;
   const testUserPayload = {
     first_name: 'delete_first',
     last_name: 'delete_last',

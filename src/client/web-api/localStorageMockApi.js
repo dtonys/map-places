@@ -24,7 +24,7 @@ export function initializeLocalStorage() {
 // clear
 
 // Get places list
-export async function loadPlacesApi() {
+export async function loadPlacesApi( webApiRequest ) {
   const placesData = await new Promise((resolve /* , reject */) => {
     const data = JSON.parse( localStorage.getItem('data') );
     setTimeout(() => resolve(data.places), 500);
@@ -33,7 +33,7 @@ export async function loadPlacesApi() {
 }
 
 // CRUD Places
-export async function createPlaceApi(payload) {
+export async function createPlaceApi( webApiRequest, payload) {
   const placesData = await new Promise((resolve /* , reject */) => {
     const data = JSON.parse( localStorage.getItem('data') );
     data.places[payload.id] = payload;
@@ -43,7 +43,7 @@ export async function createPlaceApi(payload) {
   return placesData;
 }
 
-export async function updatePlaceApi( payload ) {
+export async function updatePlaceApi( webApiRequest, payload ) {
   const { id } = payload;
   const result = await new Promise((resolve /* , reject */) => {
     const data = JSON.parse( localStorage.getItem('data') );
@@ -57,7 +57,7 @@ export async function updatePlaceApi( payload ) {
   return result;
 }
 
-export async function getPlaceApi( payload ) {
+export async function getPlaceApi( webApiRequest, payload ) {
   const { id } = payload;
   const result = await new Promise((resolve /* , reject */) => {
     const data = JSON.parse( localStorage.getItem('data') );
@@ -66,7 +66,7 @@ export async function getPlaceApi( payload ) {
   return result;
 }
 
-export async function deletePlaceApi( payload ) {
+export async function deletePlaceApi( webApiRequest, payload ) {
   const { id } = payload;
   const result = await new Promise((resolve /* , reject */) => {
     const data = JSON.parse( localStorage.getItem('data') );

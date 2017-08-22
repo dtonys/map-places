@@ -16,9 +16,6 @@ import {
 import makeAction, {
   request,
 } from 'helpers/reduxAction';
-import  {
-  DEFERRED,
-} from 'redux-modules/middleware/sagaPromiseMiddlware';
 
 import {
   ACTION_LOAD_USER,
@@ -61,22 +58,11 @@ class HomePage extends Component {
   // jsonPageRes,          // page response on client (__CLIENT__)
 
   static async getInitialProps( context ) {
-    const { res } = context;
-    let successAction = null;
-    try {
-      successAction = await res.locals.reduxStore.dispatch({
-        ...makeAction( request( ACTION_LOAD_USER ) ),
-        [DEFERRED]: true, // This action returns a promise
-      });
-    }
-    catch ( errorAction ) {
-      // USER NOT LOGGED IN, try a redirect to login page
-    }
-    return {
-      user: ( successAction && successAction.payload
-        ? successAction.payload
-        : null  ),
-    };
+    // const { res } = context;
+    // res.locals.reduxStore.dispatch(
+    //   makeAction( request( ACTION_LOAD_USER ) ),
+    // );
+    return {};
   }
 
   constructor(props) {

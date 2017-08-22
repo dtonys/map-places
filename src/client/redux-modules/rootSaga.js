@@ -7,11 +7,11 @@ import userSaga from 'redux-modules/sagas/user';
 import placesSaga from 'redux-modules/sagas/places';
 
 
-function* rootSaga() {
+function* rootSaga( webApiRequest ) {
   yield all([
-    fork(counterSaga),
-    fork(userSaga),
-    fork(placesSaga),
+    fork(counterSaga, webApiRequest),
+    fork(userSaga, webApiRequest),
+    fork(placesSaga, webApiRequest),
   ]);
 }
 

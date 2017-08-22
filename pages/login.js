@@ -12,13 +12,21 @@ import {
   ACTION_LOGIN,
 } from 'redux-modules/actions/user';
 import LoginForm from 'components/LoginForm';
+import {
+  extractLoginErrorMessage,
+} from 'redux-modules/reducers/user';
 
 
 @clientEntry()
 @attachRedux()
-@connect()
+@connect(
+  (globalState) => ({
+    loginErrorMessage: extractLoginErrorMessage(globalState),
+  })
+)
 class LoginPage extends Component {
   static propTypes = {
+    loginErrorMessage: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -27,14 +35,12 @@ class LoginPage extends Component {
   }
 
   submitLogin = ( values ) => {
-    alert( JSON.stringify( values, null, 2 ));
-
     this.props.dispatch( makeAction(
       request(ACTION_LOGIN),
       {
         email: values.email,
         password: values.password,
-      }
+      },
     ) );
   }
 
@@ -48,17 +54,19 @@ class LoginPage extends Component {
   // }
 
   render() {
+    const {
+      loginErrorMessage,
+    } = this.props;
+
     return (
       <div>
         <Layout htmlTitle={'Login'}>
           <div>
             <div style={{ marginTop: '50px' }} />
-            <LoginForm onSubmit={ this.submitLogin } />
-            {/*
             <LoginForm
               onSubmit={ this.submitLogin }
+              serverErrorMessage={loginErrorMessage}
             />
-            */}
           </div>
         </Layout>
       </div>

@@ -18,7 +18,11 @@ import makeAction, {
 
 
 // export function* apiFlow( api, actionName, deferred, isLocalStorage ) {
-export function* apiFlow( api, actionName, { deferred, isLocalStorage }) {
+export function* apiFlow( api, actionName, options = {}) {
+  const {
+    isLocalStorage,
+    deferred,
+  } = options;
   const start = isLocalStorage ? localStorageStart : apiStart;
   const success = isLocalStorage ? localStorageSuccess : apiSuccess;
   const error = isLocalStorage ? localStorageError : apiError;
@@ -62,7 +66,7 @@ export function* apiFlow( api, actionName, { deferred, isLocalStorage }) {
   return dispatchedActionsTracker;
 }
 
-export function createSagaWatcher( actionType, actionRunner ) {
+export function createSagaWatcher( actionType, actionRunner, webApiRequest ) {
   return function* () { // eslint-disable-line func-names
     while ( true ) { // eslint-disable-line no-constant-condition
       const action =  yield take([
@@ -71,10 +75,10 @@ export function createSagaWatcher( actionType, actionRunner ) {
         requestFork(actionType),
       ]);
       if ( action.type === request(actionType) ) {
-        yield* actionRunner( action );
+        yield* actionRunner( action, webApiRequest );
       }
       if ( action.type === requestFork(actionType) ) {
-        fork( actionRunner, action );
+        fork( actionRunner, action, webApiRequest );
       }
     }
   };

@@ -1,18 +1,18 @@
 import {
   fork,
   all,
-  // take,
+  call,
+  put,
 } from 'redux-saga/effects';
 import {
   apiFlow,
   createSagaWatcher,
 } from 'helpers/sagaHelpers';
-// import {
-//   request,
-// } from 'helpers/reduxAction';
-import {
-  DEFERRED,
-} from 'redux-modules/middleware/sagaPromiseMiddlware';
+import makeAction, {
+  apiStart,
+  apiSuccess,
+  apiError,
+} from 'helpers/reduxAction';
 
 import {
   ACTION_LOAD_USER,
@@ -20,57 +20,54 @@ import {
   ACTION_SIGNUP,
 } from 'redux-modules/actions/user';
 import {
-  loadUserApi,
+  sessionInfoApi,
   loginApi,
   signupApi,
 } from 'web-api/index';
+import { Router } from 'routes/pageRoutes';
 
 
-function* loadUser({ [DEFERRED]: deferred }) {
-  yield* apiFlow(
-    loadUserApi,
-    ACTION_LOAD_USER,
-    { deferred },
-  );
-}
-
-function* login({
-  [DEFERRED]: deferred,
-  payload,
-}) {
-  const actionsTracker = yield* apiFlow(
-    loginApi.bind( null, payload ),
-    ACTION_LOGIN,
-    { deferred },
-  );
-  if ( actionsTracker.successAction ) {
-    alert( JSON.stringify( actionsTracker.successAction.payload, null, 2) );
-    const successPayload = actionsTracker.successAction.payload;
-    if ( successPayload.success === true ) {
-      alert('redirect to home page');
-      return;
+function* loadUser( action, webApiRequest ) {
+  yield put( makeAction( apiStart(ACTION_LOAD_USER) ) );
+  try {
+    const responseData = yield call( sessionInfoApi, webApiRequest );
+    if ( responseData && responseData.currentUser ) {
+      yield put( makeAction( apiSuccess(ACTION_LOAD_USER), responseData.currentUser ) );
     }
-    alert('show user error');
+    else {
+      yield put( makeAction( apiSuccess(ACTION_LOAD_USER), null ) );
+    }
+  }
+  catch ( error ) {
+    makeAction( apiError(ACTION_LOAD_USER) );
   }
 }
 
-function* signup({
-  [DEFERRED]: deferred,
-  payload,
-}) {
+function* login( action, webApiRequest ) {
   const actionsTracker = yield* apiFlow(
-    signupApi.bind( null, payload ),
-    ACTION_SIGNUP,
-    { deferred },
+    loginApi.bind( null, webApiRequest, action.payload ),
+    ACTION_LOGIN,
+    { deferred: action.deferred }
   );
-  debugger;
+  if ( actionsTracker.successAction ) {
+    yield* loadUser(action, webApiRequest);
+    Router.pushRoute('/');
+  }
 }
 
-function* userSaga() {
+function* signup( action, webApiRequest ) {
+  yield* apiFlow(
+    signupApi.bind( null, webApiRequest, action.payload ),
+    ACTION_SIGNUP,
+    { deferred: action.deferred }
+  );
+}
+
+function* userSaga( webApiRequest ) {
   yield all([
-    fork( createSagaWatcher(ACTION_LOAD_USER, loadUser) ),
-    fork( createSagaWatcher(ACTION_LOGIN, login) ),
-    fork( createSagaWatcher(ACTION_SIGNUP, signup) ),
+    fork( createSagaWatcher(ACTION_LOAD_USER, loadUser, webApiRequest) ),
+    fork( createSagaWatcher(ACTION_LOGIN, login, webApiRequest) ),
+    fork( createSagaWatcher(ACTION_SIGNUP, signup, webApiRequest) ),
   ]);
 }
 

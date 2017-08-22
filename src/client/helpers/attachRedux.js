@@ -14,6 +14,8 @@ import {
   ACTION_INCREMENT_COUNTER,
 } from 'redux-modules/actions/counter';
 
+import createWebApiRequest from 'web-api/webApiRequest';
+
 let clientStore = null;
 let serverStore = null;
 let serverStoreInitialState = null;
@@ -30,10 +32,11 @@ function AttachReduxWithArgs(/* args */) {
       static async getInitialProps( context ) {
 
         if ( __SERVER__ ) {
-          const { res } = context;
+          const { res, req } = context;
           const { store, sagaMiddleware } = createStore();
           serverStore = store;
-          rootTask = sagaMiddleware.run(rootSaga);
+          const webApiRequest = createWebApiRequest(req);
+          rootTask = sagaMiddleware.run(rootSaga, webApiRequest);
           serverStore.dispatch( makeAction(
             execute(ACTION_INCREMENT_COUNTER)
           ) );
@@ -66,7 +69,8 @@ function AttachReduxWithArgs(/* args */) {
           if ( !clientStore ) {
             const { store, sagaMiddleware } = createStore( props.serverStoreInitialState );
             clientStore = store;
-            sagaMiddleware.run(rootSaga);
+            const webApiRequest = createWebApiRequest();
+            sagaMiddleware.run(rootSaga, webApiRequest);
             window.store = clientStore;
           }
         }

@@ -169,10 +169,11 @@ export async function login(req, res, next) {
       return;
     }
     // user not found
+    res.status(404);
     res.json({
       error: [ {
         code: 'NOT_FOUND',
-        message: 'User not found',
+        message: 'Email not found',
       } ],
     });
     return;

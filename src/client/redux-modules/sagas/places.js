@@ -8,9 +8,6 @@ import {
   createSagaWatcher,
 } from 'helpers/sagaHelpers';
 import {
-  DEFERRED,
-} from 'redux-modules/middleware/sagaPromiseMiddlware';
-import {
   // loadPlacesApi,
   // createPlaceApi,
   // updatePlaceApi,
@@ -35,64 +32,52 @@ import {
 } from 'redux-modules/actions/places';
 
 
-function* loadPlaces({ [DEFERRED]: deferred }) {
+function* loadPlaces( action, webApiRequest ) {
   yield* apiFlow(
-    loadPlacesApi,
+    loadPlacesApi.bind(null, webApiRequest),
     ACTION_LOAD_PLACES,
-    { deferred, isLocalStorage: true }
+    { deferred: action.deferred, isLocalStorage: true }
   );
 }
 
-function* createPlace({
-  [DEFERRED]: deferred,
-  payload,
-}) {
+function* createPlace( action, webApiRequest ) {
   yield* apiFlow(
-    createPlaceApi.bind( null, payload),
+    createPlaceApi.bind( null, webApiRequest, action.payload),
     ACTION_CREATE_PLACE,
-    { deferred, isLocalStorage: true },
+    { deferred: action.deferred, isLocalStorage: true },
   );
 }
-function* updatePlace({
-  [DEFERRED]: deferred,
-  payload,
-}) {
+function* updatePlace( action, webApiRequest ) {
   yield* apiFlow(
-    updatePlaceApi.bind( null, payload),
+    updatePlaceApi.bind( null, webApiRequest, action.payload),
     ACTION_UPDATE_PLACE,
-    { deferred, isLocalStorage: true }
+    { deferred: action.deferred, isLocalStorage: true }
   );
 }
-function* getPlace({
-  [DEFERRED]: deferred,
-  payload,
-}) {
+function* getPlace( action, webApiRequest ) {
   yield* apiFlow(
-    getPlaceApi.bind( null, payload),
+    getPlaceApi.bind( null, webApiRequest, action.payload),
     ACTION_GET_PLACE,
-    { deferred, isLocalStorage: true }
+    { deferred: action.deferred, isLocalStorage: true }
   );
 }
-function* deletePlace({
-  [DEFERRED]: deferred,
-  payload,
-}) {
+function* deletePlace( action, webApiRequest ) {
   yield* apiFlow(
-    deletePlaceApi.bind( null, payload),
+    deletePlaceApi.bind( null, webApiRequest, action.payload),
     ACTION_DELETE_PLACE,
-    { deferred, isLocalStorage: true }
+    { deferred: action.deferred, isLocalStorage: true }
   );
 }
 
-function* places() {
+function* placesSaga( webApiRequest ) {
   yield all([
-    fork( createSagaWatcher(ACTION_LOAD_PLACES, loadPlaces) ),
+    fork( createSagaWatcher(ACTION_LOAD_PLACES, loadPlaces, webApiRequest) ),
     // Create
-    fork( createSagaWatcher(ACTION_CREATE_PLACE, createPlace) ),
-    fork( createSagaWatcher(ACTION_UPDATE_PLACE, updatePlace) ),
-    fork( createSagaWatcher(ACTION_GET_PLACE, getPlace) ),
-    fork( createSagaWatcher(ACTION_DELETE_PLACE, deletePlace) ),
+    fork( createSagaWatcher(ACTION_CREATE_PLACE, createPlace, webApiRequest) ),
+    fork( createSagaWatcher(ACTION_UPDATE_PLACE, updatePlace, webApiRequest) ),
+    fork( createSagaWatcher(ACTION_GET_PLACE, getPlace, webApiRequest) ),
+    fork( createSagaWatcher(ACTION_DELETE_PLACE, deletePlace, webApiRequest) ),
   ]);
 }
 
-export default places;
+export default placesSaga;

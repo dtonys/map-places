@@ -30,7 +30,10 @@ function mockAPIWithDelay( delayMs, error ) {
   });
 }
 
-function* runIncrementAsync({ delayMs }) {
+function* runIncrementAsync(
+  { delayMs },
+  // webApiRequest,
+) {
   const flowActions = yield* apiFlow(
     mockAPIWithDelay.bind( null, delayMs, false ),
     ACTION_INCREMENT_COUNTER_ASYNC,
@@ -43,9 +46,9 @@ function* runIncrementAsync({ delayMs }) {
   }
 }
 
-function* counterSaga() {
+function* counterSaga(webApiRequest) {
   yield all([
-    fork( createSagaWatcher(ACTION_INCREMENT_COUNTER_ASYNC, runIncrementAsync) ),
+    fork( createSagaWatcher(ACTION_INCREMENT_COUNTER_ASYNC, runIncrementAsync, webApiRequest) ),
   ]);
 }
 
