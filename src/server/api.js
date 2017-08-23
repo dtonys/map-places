@@ -6,21 +6,26 @@ import * as userController from 'controllers/user';
 const router = new Router();
 
 // debug middleware
-// router.use( ( req, res, next ) => {
-//   console.log('req.protocol');
-//   console.log(req.protocol);
+router.use( ( req, res, next ) => {
+  // console.log('req.protocol');
+  // console.log(req.protocol);
 
-//   console.log('req.host');
-//   console.log(req.host);
+  // console.log('req.host');
+  // console.log(req.host);
 
-//   console.log('req.headers');
-//   console.log(JSON.stringify(req.headers));
+  // console.log('req.path');
+  // console.log(req.path);
+  // console.log('req.originalUrl');
+  // console.log(req.originalUrl);
 
-//   console.log('req.get(\'host\')');
-//   console.log(req.get('host'));
+  // console.log('req.headers');
+  // console.log(JSON.stringify(req.headers));
 
-//   next();
-// });
+  // console.log('req.get(\'host\')');
+  // console.log(req.get('host'));
+
+  next();
+});
 
 // CRUD USER
 router.post('/api/users', userController.create );

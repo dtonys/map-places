@@ -31,7 +31,7 @@ class LoginPage extends Component {
   }
 
   static async getInitialProps() {
-    return { whatever: 'whatever' };
+    return {};
   }
 
   submitLogin = ( values ) => {

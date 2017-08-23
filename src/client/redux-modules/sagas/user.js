@@ -33,9 +33,15 @@ function* loadUser( action, webApiRequest ) {
     const responseData = yield call( sessionInfoApi, webApiRequest );
     if ( responseData && responseData.currentUser ) {
       yield put( makeAction( apiSuccess(ACTION_LOAD_USER), responseData.currentUser ) );
+      if ( action.deferred ) {
+        action.deferred.resolve(responseData.currentUser);
+      }
     }
     else {
       yield put( makeAction( apiSuccess(ACTION_LOAD_USER), null ) );
+      if ( action.deferred ) {
+        action.deferred.resolve(null);
+      }
     }
   }
   catch ( error ) {

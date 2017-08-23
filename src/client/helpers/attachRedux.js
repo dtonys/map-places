@@ -8,13 +8,17 @@ import rootSaga from 'redux-modules/rootSaga';
 import createStore from 'redux-modules/createStore';
 import makeAction, {
   execute,
+  request,
 } from 'helpers/reduxAction';
-
+import {
+  ACTION_LOAD_USER,
+} from 'redux-modules/actions/user';
 import {
   ACTION_INCREMENT_COUNTER,
 } from 'redux-modules/actions/counter';
 
 import createWebApiRequest from 'web-api/webApiRequest';
+
 
 let clientStore = null;
 let serverStore = null;
@@ -31,8 +35,15 @@ function AttachReduxWithArgs(/* args */) {
 
       static async getInitialProps( context ) {
 
+        // allow client side `getInitialProps` calls to access state and dispatch
+        if ( __CLIENT__ ) {
+          if ( clientStore ) {
+            context.store = clientStore;
+          }
+        }
+
         if ( __SERVER__ ) {
-          const { res, req } = context;
+          const { req } = context;
           const { store, sagaMiddleware } = createStore();
           serverStore = store;
           const webApiRequest = createWebApiRequest(req);
@@ -40,14 +51,19 @@ function AttachReduxWithArgs(/* args */) {
           serverStore.dispatch( makeAction(
             execute(ACTION_INCREMENT_COUNTER)
           ) );
-          // Pass the store so the child component can dispatch actions in it's own getInitialProps
-          res.locals.reduxStore = serverStore;
+          serverStore.dispatch( makeAction(
+            request( ACTION_LOAD_USER )
+          ) );
+          // Pass the store so the child component so it can access state and dispatch
+          context.store = serverStore;
         }
+
         let wrappedComponentInitialProps = {};
         // Let the child components execute their actions as needed
         if ( WrappedComponent.getInitialProps ) {
           wrappedComponentInitialProps = await WrappedComponent.getInitialProps(context);
         }
+
         if ( __SERVER__ ) {
           // Dispatch END, prevents new actions from coming in.  Existing actions will finish.
           serverStore.dispatch(REDUX_SAGA_END);

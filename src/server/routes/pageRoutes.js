@@ -8,4 +8,5 @@ routes
   .add('users', '/users/:id');
 
 export const Router = routes.Router;
+export const Link = routes.Link;
 export default routes;

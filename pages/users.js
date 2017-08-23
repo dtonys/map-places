@@ -2,11 +2,19 @@ import { Component } from 'react';
 
 import clientEntry from 'helpers/clientEntry';
 import attachRedux from 'helpers/attachRedux';
+import authenticatedPage from  'helpers/authenticatedPage';
+
 import Layout from 'components/Layout';
+
 
 @clientEntry()
 @attachRedux()
+@authenticatedPage()
 class UserPage extends Component {
+  static async getInitialProps() {
+    return {};
+  }
+
   render() {
     return (
       <div>

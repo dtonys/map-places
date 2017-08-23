@@ -23,10 +23,10 @@ function ClientEntryWithArgs(/* args */) {
   function ClientEntry( WrappedComponent ) {
 
     class ClientEntryHOC extends Component {
-      static async getInitialProps( nextJSContext ) {
+      static async getInitialProps( context ) {
         let wrappedComponentInitialProps = {};
         if ( WrappedComponent.getInitialProps ) {
-          wrappedComponentInitialProps = await WrappedComponent.getInitialProps(nextJSContext);
+          wrappedComponentInitialProps = await WrappedComponent.getInitialProps(context);
         }
         return wrappedComponentInitialProps;
       }

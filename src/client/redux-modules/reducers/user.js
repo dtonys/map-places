@@ -21,13 +21,27 @@ export function extractState(globalState) {
   return globalState[STORE_KEY];
 }
 
+// Selectors
+export function extractAuthLoaded(globalState) {
+  return lodashGet( globalState, 'user.currentUser.authLoaded' );
+}
+
+export function extractAuthenticated(globalState) {
+  return Boolean( lodashGet( globalState, 'user.currentUser.data' ));
+}
+
+export function extractCurrentUser(globalState) {
+  return lodashGet( globalState, 'user.currentUser.data' );
+}
+
 export function extractLoginErrorMessage(globalState) {
-  return lodashGet( globalState[STORE_KEY].login, 'apiMeta.error.message', null );
+  return lodashGet( extractState(globalState).login, 'apiMeta.error.message', null );
 }
 
 const currentUserInitialState = {
   meta: null,
   data: null,
+  authLoaded: false,
 };
 function currentUserReducer( state = currentUserInitialState, action ) {
   switch ( action.type ) {
@@ -42,6 +56,7 @@ function currentUserReducer( state = currentUserInitialState, action ) {
         ...state,
         data: action.payload,
         apiMeta: metaReducer( state.apiMeta, action ),
+        authLoaded: true,
       };
     }
     case apiError(ACTION_LOAD_USER): {
