@@ -121,6 +121,8 @@ export async function signup( req, res, next ) {
       last_name: last_name,
       password_hash: passwordHash,
     });
+    // log user in
+    await createSessionWithCookie( user._id.toString(), res );
     // return user
     res.json({
       data: user,
@@ -145,13 +147,8 @@ export async function login(req, res, next) {
     if ( user ) {
       const validPassword = bcrypt.compareSync(password, user.password_hash);
       if ( validPassword ) {
-        try {
-          await createSessionWithCookie( user._id.toString(), res );
-        }
-        catch ( error ) {
-          next(error);
-          return;
-        }
+        // log user in
+        await createSessionWithCookie( user._id.toString(), res );
         // login success
         res.json({
           data: user,

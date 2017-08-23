@@ -29,7 +29,7 @@ import {
 import { Router } from 'routes/pageRoutes';
 
 
-function* loadUser( action, webApiRequest ) {
+export function* loadUser( action, webApiRequest ) {
   yield put( makeAction( apiStart(ACTION_LOAD_USER) ) );
   try {
     const responseData = yield call( sessionInfoApi, webApiRequest );
@@ -59,16 +59,8 @@ function* login( action, webApiRequest ) {
   );
   if ( actionsTracker.successAction ) {
     yield* loadUser(action, webApiRequest);
-    Router.pushRoute('/');
+    Router.pushRoute( action.payload.nextPath || '/');
   }
-}
-
-function* signup( action, webApiRequest ) {
-  yield* apiFlow(
-    signupApi.bind( null, webApiRequest, action.payload ),
-    ACTION_SIGNUP,
-    { deferred: action.deferred }
-  );
 }
 
 function* logout( action, webApiRequest ) {
@@ -87,7 +79,6 @@ function* userSaga( webApiRequest ) {
   yield all([
     fork( createSagaWatcher(ACTION_LOAD_USER, loadUser, webApiRequest) ),
     fork( createSagaWatcher(ACTION_LOGIN, login, webApiRequest) ),
-    fork( createSagaWatcher(ACTION_SIGNUP, signup, webApiRequest) ),
     fork( createSagaWatcher(ACTION_LOGOUT, logout, webApiRequest) ),
   ]);
 }

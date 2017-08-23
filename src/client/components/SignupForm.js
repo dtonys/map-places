@@ -14,6 +14,7 @@ import TextInput from 'components/TextInput';
 
 const SignupFormView = ({
   handleSubmit,
+  serverErrorMessage,
 }) => {
   return (
     <div className="formWrap">
@@ -25,6 +26,11 @@ const SignupFormView = ({
       >
         <h3> Signup </h3>
         <fieldset>
+          { serverErrorMessage &&
+            <div className="error" style={{ marginBottom: '10px' }} >
+              {serverErrorMessage}
+            </div>
+          }
           <ReduxFormField
             component={TextInput}
             label="Email"
@@ -58,6 +64,7 @@ const SignupFormView = ({
 };
 SignupFormView.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  serverErrorMessage: PropTypes.string,
 };
 
 const SignupForm = compose(

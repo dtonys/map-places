@@ -23,78 +23,61 @@ export function extractState(globalState) {
 
 // Selectors
 export function extractAuthLoaded(globalState) {
-  return lodashGet( globalState, 'user.currentUser.authLoaded' );
+  return lodashGet( extractState(globalState), 'loadUserApiMeta.loaded' );
 }
 
 export function extractAuthenticated(globalState) {
-  return Boolean( lodashGet( globalState, 'user.currentUser.data' ));
+  return Boolean( lodashGet( extractState(globalState), 'currentUser' ));
 }
 
 export function extractCurrentUser(globalState) {
-  return lodashGet( globalState, 'user.currentUser.data' );
+  return lodashGet( extractState(globalState), 'currentUser' );
 }
 
 export function extractLoginErrorMessage(globalState) {
-  return lodashGet( extractState(globalState).login, 'apiMeta.error.message', null );
+  return lodashGet( extractState(globalState), 'loginApiMeta.error.message', null );
 }
 
-const currentUserInitialState = {
-  meta: null,
-  data: null,
-  authLoaded: false,
+const initialState = {
+  loadUserApiMeta: null,
+  loginApiMeta: null,
+  currentUser: null,
 };
-function currentUserReducer( state = currentUserInitialState, action ) {
+function reducer( state = initialState, action ) {
   switch ( action.type ) {
+    // Login
+    case apiStart(ACTION_LOGIN):
+    case apiSuccess(ACTION_LOGIN):
+    case apiError(ACTION_LOGIN): {
+      return {
+        loginApiMeta: metaReducer( state.loginApiMeta, action ),
+      };
+    }
+
+    // Load user
     case apiStart(ACTION_LOAD_USER): {
       return {
         ...state,
-        apiMeta: metaReducer( state.apiMeta, action ),
+        loadUserApiMeta: metaReducer( state.loadUserApiMeta, action ),
       };
     }
     case apiSuccess(ACTION_LOAD_USER): {
       return {
         ...state,
-        data: action.payload,
-        apiMeta: metaReducer( state.apiMeta, action ),
-        authLoaded: true,
+        currentUser: action.payload,
+        loadUserApiMeta: metaReducer( state.loadUserApiMeta, action ),
       };
     }
     case apiError(ACTION_LOAD_USER): {
       return {
         ...state,
-        apiMeta: metaReducer( state.apiMeta, action ),
+        loadUserApiMeta: metaReducer( state.loadUserApiMeta, action ),
       };
     }
     default: {
       return state;
     }
   }
-}
-
-const loginInitialState = {};
-function loginReducer( state = loginInitialState, action ) {
-  switch ( action.type ) {
-    case apiStart(ACTION_LOGIN):
-    case apiSuccess(ACTION_LOGIN):
-    case apiError(ACTION_LOGIN): {
-      return {
-        apiMeta: metaReducer( state.apiMeta, action ),
-      };
-    }
-    default: {
-      return state;
-    }
-  }
-}
-
-// login
-// user
-
-function reducer( state = {}, action ) {
-  return {
-    currentUser: currentUserReducer( state.currentUser, action ),
-    login: loginReducer( state.login, action ),
-  };
 }
 
 export default reducer;

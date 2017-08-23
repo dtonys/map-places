@@ -27,6 +27,7 @@ import {
 class LoginPage extends Component {
   static propTypes = {
     loginErrorMessage: PropTypes.string,
+    url: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
   }
 
@@ -35,11 +36,14 @@ class LoginPage extends Component {
   }
 
   submitLogin = ( values ) => {
+    // const nextPath = this.props.url.query.next
+    const nextPath = this.props.url.query.next;
     this.props.dispatch( makeAction(
       request(ACTION_LOGIN),
       {
         email: values.email,
         password: values.password,
+        nextPath: nextPath,
       },
     ) );
   }

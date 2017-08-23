@@ -8,7 +8,6 @@ import MapManager from 'helpers/MapManager';
 
 import clientEntry from 'helpers/clientEntry';
 import attachRedux from 'helpers/attachRedux';
-import authenticatedPage from  'helpers/authenticatedPage';
 
 import {
   tryGetCurrentPosition,
@@ -58,7 +57,7 @@ class HomePage extends Component {
   // res: expressResponse, // res from server  (__SERVER__)
   // jsonPageRes,          // page response on client (__CLIENT__)
 
-  static async getInitialProps( context ) {
+  static async getInitialProps( /* context */ ) {
     return {};
   }
 

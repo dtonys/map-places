@@ -1,0 +1,1 @@
+export const ACTION_SIGNUP = 'user/ACTION_SIGNUP'; //  eslint-disable-line

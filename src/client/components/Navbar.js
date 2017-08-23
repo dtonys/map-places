@@ -88,7 +88,7 @@ class Navbar extends Component {
         { userAuthenticated &&
           <div className="section section-3">
             <div className="userName" >
-              { currentUser.first_name + ' ' + currentUser.last_name }
+              { currentUser.email }
             </div>
             <div style={{ marginLeft: '10px' }} />
             <a>

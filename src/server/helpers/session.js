@@ -7,6 +7,7 @@ import User from 'models/user';
 
 
 let encryptor = null;
+// NOTE: `process.env.ENCRYPTION_SECRET` is not loaded at startup, so create the encryptor here.
 export function createSessionEncryptor() {
   encryptor = createEncryptor( process.env.ENCRYPTION_SECRET );
 }
