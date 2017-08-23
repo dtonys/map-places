@@ -3,22 +3,16 @@ import PropTypes from 'prop-types';
 import { wrapDisplayName } from 'recompose';
 import { connect } from 'react-redux';
 
-import makeAction, {
-  request,
-} from 'helpers/reduxAction';
-import {
-  ACTION_LOAD_USER,
-} from 'redux-modules/actions/user';
 import { Router } from 'routes/pageRoutes';
 
 import {
-  extractAuthLoaded,
   extractAuthenticated,
 } from 'redux-modules/reducers/user';
 
 // Ideas for options:
 // @authenticated( true )
 // @authenticated({ role: 'admin' })
+
 
 function AuthenticatedPageWithOptions( options ) {
 
@@ -50,6 +44,9 @@ function AuthenticatedPageWithOptions( options ) {
         let wrappedComponentInitialProps = {};
         const { store } = context;
         const globalState = store.getState();
+
+        console.log('globalState');
+        console.log(JSON.stringify(globalState));
 
         const userAuthenticated = extractAuthenticated(globalState);
         if ( !userAuthenticated ) {

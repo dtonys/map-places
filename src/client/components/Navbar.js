@@ -10,6 +10,13 @@ import {
   extractAuthenticated,
   extractCurrentUser,
 } from 'redux-modules/reducers/user';
+import makeAction, {
+  request,
+} from 'helpers/reduxAction';
+import {
+  ACTION_LOGOUT,
+} from 'redux-modules/actions/user';
+
 
 @connect(
   (globalState) => ({
@@ -21,6 +28,14 @@ class Navbar extends Component {
   static propTypes = {
     userAuthenticated: PropTypes.bool.isRequired,
     currentUser: PropTypes.object,
+    dispatch: PropTypes.func,
+  }
+
+  onLogoutClick = () => {
+    const { dispatch } = this.props;
+    dispatch(
+      makeAction( request(ACTION_LOGOUT) )
+    );
   }
 
   render() {
@@ -77,9 +92,16 @@ class Navbar extends Component {
             </div>
             <div style={{ marginLeft: '10px' }} />
             <a>
-              <button className="button outline">Logout</button>
+              <button
+                className="button outline"
+                onClick={this.onLogoutClick}
+              >Logout</button>
             </a>
-
+            <Link route="/users/profile">
+              <a>
+                <button className="button outline secondary">Profile</button>
+              </a>
+            </Link>
           </div>
         }
 

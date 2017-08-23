@@ -51,8 +51,11 @@ function AttachReduxWithArgs(/* args */) {
           serverStore.dispatch( makeAction(
             execute(ACTION_INCREMENT_COUNTER)
           ) );
-          serverStore.dispatch( makeAction(
-            request( ACTION_LOAD_USER )
+          // Load user on every page
+          await serverStore.dispatch( makeAction(
+            request( ACTION_LOAD_USER ),
+            null,
+            { deferred: true }
           ) );
           // Pass the store so the child component so it can access state and dispatch
           context.store = serverStore;

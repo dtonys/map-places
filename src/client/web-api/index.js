@@ -21,6 +21,11 @@ export async function signupApi( webApiRequest, payload ) {
   return response;
 }
 
+export async function logoutApi( webApiRequest ) {
+  const response = await webApiRequest('GET', '/api/logout');
+  return response;
+}
+
 
 export async function loadPageDataApi( webApiRequest ) {
   const response = await webApiRequest('GET', '/api/page');
