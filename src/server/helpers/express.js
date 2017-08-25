@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import favicon from 'serve-favicon';
 import pageRoutes from 'routes/pageRoutes';
 import api from 'api';
-
+import { renderEmail } from 'email/mailer.js';
 
 import {
   APP_PORT,
@@ -41,6 +41,8 @@ export async function createExpressApp( next ) {
   server.use(bodyParser.json());
   server.use(bodyParser.urlencoded({ extended: true }));
   // Session middleware
+
+  server.use('/email/:mailName', renderEmail);
 
   // API server
   server.use(api);
