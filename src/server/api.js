@@ -40,6 +40,7 @@ router.post('/api/signup', userController.signup);
 router.post('/api/login', userController.login);
 router.get('/api/logout', userController.logout);
 router.get('/api/session/info', userController.sessionInfo);
+router.get('/api/verify-email', userController.verifyEmail);
 
 // CRUD PLACE
 router.post('/api/places', placeController.create );

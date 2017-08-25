@@ -15,6 +15,24 @@ function registerMongooseModels() {
   });
 }
 
+export function reIndexAll() {
+  const db = mongoose.connection;
+  const collectionNames = Object.keys(db.collections);
+  const dropIndexPromises = collectionNames.map(( collectionName ) => {
+    return db.collections[collectionName].dropIndexes();
+  });
+  return Promise.all(dropIndexPromises)
+    .then(() => {
+      const buildIndexPromises = collectionNames.map(( collectionName ) => {
+        return db.collections[collectionName].reIndex();
+      });
+      return Promise.all(buildIndexPromises);
+    })
+    .then(() => {
+      console.log('reIndexAll done');
+    });
+}
+
 export function buildAllIndexes() {
   debug('buildAllIndexes');
   const db = mongoose.connection;

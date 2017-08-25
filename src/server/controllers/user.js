@@ -9,6 +9,7 @@ import {
 import {
   SESSION_COOKIE_NAME,
 } from 'models/session';
+import * as mailer from 'email/mailer';
 
 
 const debug = require('debug')('mp-user-controller');
@@ -121,6 +122,9 @@ export async function signup( req, res, next ) {
       last_name: last_name,
       password_hash: passwordHash,
     });
+    // Send verification email
+    mailer.verifySignupEmail( email );
+    // mailer.verifySignup
     // log user in
     await createSessionWithCookie( user._id.toString(), res );
     // return user
@@ -132,6 +136,25 @@ export async function signup( req, res, next ) {
   catch ( error ) {
     next( error );
   }
+}
+
+export async function verifyEmail( req, res, next ) {
+  const sessionToken = req.query.sessionToken;
+  const { user, session } = await getCurrentSessionAndUser( sessionToken );
+  if ( !user || !session ) {
+    res.redirect('/');
+    return;
+  }
+  // set user as verified
+  user.set({ is_email_verified: true });
+  await user.save();
+  // destroy the session
+  await session.remove();
+
+  // log user in
+  await createSessionWithCookie( user._id.toString(), res );
+  // redirect to home page
+  res.redirect('/');
 }
 
 export async function login(req, res, next) {
