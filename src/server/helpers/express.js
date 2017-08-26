@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import favicon from 'serve-favicon';
 import pageRoutes from 'routes/pageRoutes';
 import api from 'api';
-import { renderEmail } from 'email/mailer.js';
+import { renderEmail } from 'email/mailer';
 
 import {
   APP_PORT,
