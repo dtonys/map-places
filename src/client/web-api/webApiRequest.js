@@ -1,8 +1,4 @@
 import superagent from 'superagent';
-import {
-  APP_PORT,
-  TEST_PORT,
-} from 'constants';
 
 export const UNKNOWN_ERROR = 'UNKNOWN_ERROR';
 export const NETWORK_ERROR = 'NETWORK_ERROR';
@@ -20,6 +16,19 @@ export const WEB_API_ERROR_TYPES = [
 
 const debug = require('debug')('mp-webApiRequest');
 
+function maskUnhandledError(error) {
+  let maskedError = error;
+  if ( !__DEVELOPMENT__ ) {
+    if ( error.webApiErrorType !== SERVER_VALIDATION_ERROR ) {
+      maskedError = {
+        ...error,
+        message: 'Internal server error.',
+      };
+    }
+  }
+  return maskedError;
+}
+
 function webApiHandleError( networkError, response, responseBody ) {
   // No `networkError` or `response`. This should not happen. Report unexpected error.
   if ( !networkError && !response ) {
@@ -27,7 +36,7 @@ function webApiHandleError( networkError, response, responseBody ) {
       webApiErrorType: UNKNOWN_ERROR,
       message: 'Unknown error: Neither `networkError` nor `response` provided',
     };
-    return error;
+    return maskUnhandledError(error);
   }
   if ( networkError ) {
     const error = {
@@ -36,7 +45,7 @@ function webApiHandleError( networkError, response, responseBody ) {
       message: networkError.message,
       stack: networkError.stack,
     };
-    return error;
+    return maskUnhandledError(error);
   }
   if ( !responseBody ) {
     let error = {
@@ -58,7 +67,7 @@ function webApiHandleError( networkError, response, responseBody ) {
         responseText: response.error.responseText,
       };
     }
-    return error;
+    return maskUnhandledError(error);
   }
   if ( response.status >= 400 ) {
     if ( ( response.status === 422 || response.status === 404 ) &&
@@ -75,7 +84,7 @@ function webApiHandleError( networkError, response, responseBody ) {
       webApiErrorType: HTTP_STATUS_ERROR,
       ...responseBody,
     };
-    return error;
+    return maskUnhandledError(error);
   }
   return false;
 }

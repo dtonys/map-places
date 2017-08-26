@@ -1,6 +1,8 @@
 import {
   ACTION_LOAD_USER,
   ACTION_LOGIN,
+  ACTION_RESET_PASSWORD,
+  ACTION_LOST_PASSWORD,
 } from 'redux-modules/actions/user';
 import lodashGet from 'lodash/get';
 
@@ -38,13 +40,42 @@ export function extractLoginErrorMessage(globalState) {
   return lodashGet( extractState(globalState), 'loginApiMeta.error.message', null );
 }
 
+export function extractResetPasswordErrorMessage(globalState) {
+  return lodashGet( extractState(globalState), 'resetPasswordApiMeta.error.message', null );
+}
+
+export function extractLostPasswordErrorMessage(globalState) {
+  return lodashGet( extractState(globalState), 'lostPasswordApiMeta.error.message', null );
+}
+
+
 const initialState = {
+  resetPasswordApiMeta: null,
+  lostPasswordApiMeta: null,
   loadUserApiMeta: null,
   loginApiMeta: null,
   currentUser: null,
 };
 function reducer( state = initialState, action ) {
   switch ( action.type ) {
+    // Reset Password
+    case apiStart(ACTION_RESET_PASSWORD):
+    case apiSuccess(ACTION_RESET_PASSWORD):
+    case apiError(ACTION_RESET_PASSWORD): {
+      return {
+        resetPasswordApiMeta: metaReducer( state.resetPasswordApiMeta, action ),
+      };
+    }
+
+    // Lost Password
+    case apiStart(ACTION_LOST_PASSWORD):
+    case apiSuccess(ACTION_LOST_PASSWORD):
+    case apiError(ACTION_LOST_PASSWORD): {
+      return {
+        lostPasswordApiMeta: metaReducer( state.lostPasswordApiMeta, action ),
+      };
+    }
+
     // Login
     case apiStart(ACTION_LOGIN):
     case apiSuccess(ACTION_LOGIN):

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'routes/pageRoutes';
 import {
   Field as ReduxFormField,
   reduxForm,
@@ -8,13 +7,12 @@ import {
 import { compose } from 'recompose';
 import {
   required as requiredValidator,
-  email as emailValidator,
   createValidator,
 } from 'mp-validation';
 import TextInput from 'components/TextInput';
 
 
-const LoginFormView = ({
+const ResetPasswordFormView = ({
   handleSubmit,
   serverErrorMessage,
 }) => {
@@ -23,10 +21,10 @@ const LoginFormView = ({
       <form
         method="post"
         action=""
-        className="form loginForm"
+        className="form resetPasswordForm"
         onSubmit={handleSubmit}
       >
-        <h3> Login </h3>
+        <h3> Reset Password </h3>
         <fieldset>
           { serverErrorMessage &&
             <div className="error" style={{ marginBottom: '10px' }} >
@@ -35,38 +33,25 @@ const LoginFormView = ({
           }
           <ReduxFormField
             component={TextInput}
-            label="Email"
-            type="email"
-            name="email"
+            label="Password"
+            type="text"
+            name="password"
             requiredStar
           />
           <ReduxFormField
             component={TextInput}
-            label="Password"
-            type="password"
-            name="password"
+            label="Password Confirm"
+            type="text"
+            name="passwordConfirm"
             requiredStar
           />
-          <div className="form-item row">
-            <button className="col col-6" >Submit</button>
-            <div className="col col-6 forgotPassword">
-              <Link route="/lost-password">
-                <a className="forgotPasswordLink" >Forgot your password?</a>
-              </Link>
-            </div>
+          <div className="form-item">
+            <button className="w50" >Submit</button>
           </div>
         </fieldset>
       </form>
       <style jsx>{`
-        .forgotPassword {
-          text-align: center;
-          padding-top: 5px;
-        }
-        .forgotPasswordLink {
-          text-decoration: none;
-          font-size: 14px;
-        }
-        .loginForm {
+        .resetPasswordForm {
           width: 600px;
           margin: auto;
         }
@@ -77,19 +62,19 @@ const LoginFormView = ({
     </div>
   );
 };
-LoginFormView.propTypes = {
+ResetPasswordFormView.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   serverErrorMessage: PropTypes.string,
 };
 
-const LoginForm = compose(
+const ResetPasswordForm = compose(
   reduxForm({
-    form: 'login',
+    form: 'reset-password',
     validate: createValidator({
-      email: [ requiredValidator, emailValidator ],
       password: [ requiredValidator ],
+      passwordConfirm: [ requiredValidator ],
     }),
   })
-)(LoginFormView);
+)(ResetPasswordFormView);
 
-export default LoginForm;
+export default ResetPasswordForm;

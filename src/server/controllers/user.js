@@ -106,7 +106,6 @@ export async function signup( req, res, next ) {
     res.status(422);
     res.json({
       error: [ {
-        code: 'EXISTING_RESOURCE',
         message: 'User email already in use',
       } ],
     });
@@ -138,10 +137,11 @@ export async function signup( req, res, next ) {
   }
 }
 
-export async function verifyEmail( req, res, next ) {
+export async function verifyEmail( req, res ) {
   const sessionToken = req.query.sessionToken;
   const { user, session } = await getCurrentSessionAndUser( sessionToken );
   if ( !user || !session ) {
+    console.log('User not found or invalid session');
     res.redirect('/');
     return;
   }
@@ -167,40 +167,116 @@ export async function login(req, res, next) {
   // find user by email
   try {
     const user = await User.findOne({ email: email });
-    if ( user ) {
-      const validPassword = bcrypt.compareSync(password, user.password_hash);
-      if ( validPassword ) {
-        // log user in
-        await createSessionWithCookie( user._id.toString(), res );
-        // login success
-        res.json({
-          data: user,
-        });
-        return;
-      }
+    if ( !user ) {
+      // user not found
+      res.status(404);
+      res.json({
+        error: [ {
+          message: 'Email not found',
+        } ],
+      });
+      return;
+    }
+    const validPassword = bcrypt.compareSync(password, user.password_hash);
+    if ( !validPassword ) {
       // wrong password
       res.status(422);
       res.json({
         error: [ {
-          code: '',
           message: 'Wrong password',
         } ],
       });
       return;
     }
-    // user not found
-    res.status(404);
+    // log user in
+    await createSessionWithCookie( user._id.toString(), res );
+    // login success
     res.json({
-      error: [ {
-        code: 'NOT_FOUND',
-        message: 'Email not found',
-      } ],
+      data: user,
     });
     return;
   }
   catch ( error ) {
     next( error );
   }
+}
+
+export async function lostPassword(req, res) {
+  const payload = req.body;
+  const user = await User.findOne({ email: payload.email });
+  if ( !user ) {
+    // user not found
+    res.status(404);
+    res.json({
+      error: [ {
+        message: 'Email not found',
+      } ],
+    });
+    return;
+  }
+  await mailer.resetPasswordEmail( user.email );
+  res.json({
+    data: null,
+  });
+}
+
+export async function resetPassword(req, res) {
+  const payload = req.body;
+  const { user, session } = await getCurrentSessionAndUser( payload.sessionToken );
+  if ( !session || !user ) {
+    res.status(422);
+    res.json({
+      error: [ {
+        message: 'Invalid or expired session.',
+      } ],
+    });
+    return;
+  }
+  if ( user.reset_password_token !== payload.sessionToken ) {
+    res.status(422);
+    res.json({
+      error: [ {
+        message: 'Invalid or expired session.',
+      } ],
+    });
+    return;
+  }
+
+  // validate args
+  const validationErrors = [
+    'password',
+    'passwordConfirm',
+  ].map(( requiredField ) => {
+    if ( !payload[requiredField] ) {
+      return { message: `${requiredField} is required.` };
+    }
+    return null;
+  }).filter((error) => !!error);
+  if ( payload.password !== payload.passwordConfirm ) {
+    validationErrors.push({ message: 'Password and confirm must match.' });
+  }
+  if ( validationErrors.length ) {
+    res.status(422);
+    res.json({
+      error: validationErrors,
+    });
+    return;
+  }
+
+  // set the new password
+  const passwordHash = bcrypt.hashSync(payload.password, 10);
+  user.set({
+    password_hash: passwordHash,
+    reset_password_token: null,
+  });
+  await user.save();
+  // destroy the session
+  await session.remove();
+
+  // done
+  res.json({
+    data: null,
+  });
 }
 
 export async function logout(req, res, next) {

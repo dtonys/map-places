@@ -78,9 +78,9 @@ function createStore( initialState ) {
 
             if (groupsOpen === 0) {
               // Show the stack trace in a subgroup.
-              console.group('trace'); // eslint-disable-line no-console
-              console.log(cleanupTrace(new Error().stack)); // eslint-disable-line no-console
-              console.groupEnd(); // eslint-disable-line no-console
+              // console.group('trace'); // eslint-disable-line no-console
+              // console.log(cleanupTrace(new Error().stack)); // eslint-disable-line no-console
+              // console.groupEnd(); // eslint-disable-line no-console
             }
 
             // Call the original `groupEnd`.

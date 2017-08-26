@@ -115,7 +115,6 @@ export async function verifySignupEmail( email ) {
   const sessionId = session._id.toString();
   // Send token out to auth the verify-email api
   const verifyLink = `${process.env.SERVER_URL_BASE}/api/verify-email?sessionToken=${sessionId}`;
-  // `<a href=${verifyLink}>Click here to verify your email</a>`
   const html = emailTemplates['verifyEmail']({ data: {
     email: user.email,
     first_name: user.first_name,
@@ -146,7 +145,7 @@ export async function resetPasswordEmail( email ) {
   user.set({ reset_password_token: sessionId });
   await user.save();
   // Send the token out, one time use.
-  const resetLink = `${process.env.SERVER_URL_BASE}/api/reset-password?sessionToken=${sessionId}`;
+  const resetLink = `${process.env.SERVER_URL_BASE}/reset-password?sessionToken=${sessionId}`;
   const html = emailTemplates['resetPassword']({ data: {
     email: user.email,
     first_name: user.first_name,

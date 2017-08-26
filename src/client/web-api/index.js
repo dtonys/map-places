@@ -21,6 +21,24 @@ export async function signupApi( webApiRequest, payload ) {
   return response;
 }
 
+export async function lostPasswordApi( webApiRequest, payload ) {
+  const response = await webApiRequest(
+    'POST', '/api/lost-password', {
+      body: payload,
+    },
+  );
+  return response;
+}
+
+export async function resetPasswordApi( webApiRequest, payload ) {
+  const response = await webApiRequest(
+    'POST', '/api/reset-password', {
+      body: payload,
+    },
+  );
+  return response;
+}
+
 export async function logoutApi( webApiRequest ) {
   const response = await webApiRequest('GET', '/api/logout');
   return response;

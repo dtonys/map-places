@@ -5,7 +5,7 @@ import {
 import counterSaga from 'redux-modules/sagas/counter';
 import userSaga from 'redux-modules/sagas/user';
 import placesSaga from 'redux-modules/sagas/places';
-import signupSaga from 'redux-modules/sagas/signupSaga';
+import signupSaga from 'redux-modules/sagas/signup';
 
 
 function* rootSaga( webApiRequest ) {

@@ -36,7 +36,6 @@ class Layout extends React.Component {  // eslint-disable-line
           .content {
             max-width: 840px;
             margin: auto;
-            height: 100%;
           }
           .scrollWrap {
             position: absolute;

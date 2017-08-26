@@ -17,14 +17,16 @@ import makeAction, {
 import {
   ACTION_LOAD_USER,
   ACTION_LOGIN,
-  ACTION_SIGNUP,
   ACTION_LOGOUT,
+  ACTION_RESET_PASSWORD,
+  ACTION_LOST_PASSWORD,
 } from 'redux-modules/actions/user';
 import {
   sessionInfoApi,
   loginApi,
-  signupApi,
   logoutApi,
+  lostPasswordApi,
+  resetPasswordApi,
 } from 'web-api/index';
 import { Router } from 'routes/pageRoutes';
 
@@ -75,11 +77,30 @@ function* logout( action, webApiRequest ) {
   }
 }
 
+function* resetPassword( action, webApiRequest ) {
+  yield* apiFlow(
+    resetPasswordApi.bind( null, webApiRequest, action.payload ),
+    ACTION_RESET_PASSWORD,
+    { deferred: action.deferred }
+  );
+}
+
+function* lostPassword( action, webApiRequest ) {
+  yield* apiFlow(
+    lostPasswordApi.bind( null, webApiRequest, action.payload ),
+    ACTION_LOST_PASSWORD,
+    { deferred: action.deferred }
+  );
+}
+
+
 function* userSaga( webApiRequest ) {
   yield all([
     fork( createSagaWatcher(ACTION_LOAD_USER, loadUser, webApiRequest) ),
     fork( createSagaWatcher(ACTION_LOGIN, login, webApiRequest) ),
     fork( createSagaWatcher(ACTION_LOGOUT, logout, webApiRequest) ),
+    fork( createSagaWatcher(ACTION_RESET_PASSWORD, resetPassword, webApiRequest) ),
+    fork( createSagaWatcher(ACTION_LOST_PASSWORD, lostPassword, webApiRequest) ),
   ]);
 }
 

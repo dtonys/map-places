@@ -45,9 +45,6 @@ function AuthenticatedPageWithOptions( options ) {
         const { store } = context;
         const globalState = store.getState();
 
-        console.log('globalState');
-        console.log(JSON.stringify(globalState));
-
         const userAuthenticated = extractAuthenticated(globalState);
         if ( !userAuthenticated ) {
           AuthenticatedPageHOC.redirectToLogin(context);
@@ -56,16 +53,6 @@ function AuthenticatedPageWithOptions( options ) {
           wrappedComponentInitialProps = await WrappedComponent.getInitialProps(context);
         }
         return wrappedComponentInitialProps;
-      }
-
-      componentWillMount() {
-        if ( __CLIENT__ ) {
-          // if not authenticated, redirect to login with next path
-          // if ( !this.props.authenticated ) {
-          //   const nextPath = encodeURIComponent(window.location.pathname + window.location.search);
-          //   Router.replaceRoute(`/login?next=${nextPath}`);
-          // }
-        }
       }
 
       render() {

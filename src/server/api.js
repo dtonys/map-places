@@ -41,6 +41,8 @@ router.post('/api/login', userController.login);
 router.get('/api/logout', userController.logout);
 router.get('/api/session/info', userController.sessionInfo);
 router.get('/api/verify-email', userController.verifyEmail);
+router.post('/api/lost-password', userController.lostPassword);
+router.post('/api/reset-password', userController.resetPassword);
 
 // CRUD PLACE
 router.post('/api/places', placeController.create );

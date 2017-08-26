@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'routes/pageRoutes';
 import {
   Field as ReduxFormField,
   reduxForm,
@@ -14,7 +13,7 @@ import {
 import TextInput from 'components/TextInput';
 
 
-const LoginFormView = ({
+const LostPasswordFormView = ({
   handleSubmit,
   serverErrorMessage,
 }) => {
@@ -23,10 +22,10 @@ const LoginFormView = ({
       <form
         method="post"
         action=""
-        className="form loginForm"
+        className="form lostPasswordForm"
         onSubmit={handleSubmit}
       >
-        <h3> Login </h3>
+        <h3> Lost Password </h3>
         <fieldset>
           { serverErrorMessage &&
             <div className="error" style={{ marginBottom: '10px' }} >
@@ -40,33 +39,13 @@ const LoginFormView = ({
             name="email"
             requiredStar
           />
-          <ReduxFormField
-            component={TextInput}
-            label="Password"
-            type="password"
-            name="password"
-            requiredStar
-          />
-          <div className="form-item row">
-            <button className="col col-6" >Submit</button>
-            <div className="col col-6 forgotPassword">
-              <Link route="/lost-password">
-                <a className="forgotPasswordLink" >Forgot your password?</a>
-              </Link>
-            </div>
+          <div className="form-item">
+            <button className="w50" >Submit</button>
           </div>
         </fieldset>
       </form>
       <style jsx>{`
-        .forgotPassword {
-          text-align: center;
-          padding-top: 5px;
-        }
-        .forgotPasswordLink {
-          text-decoration: none;
-          font-size: 14px;
-        }
-        .loginForm {
+        .lostPasswordForm {
           width: 600px;
           margin: auto;
         }
@@ -77,19 +56,18 @@ const LoginFormView = ({
     </div>
   );
 };
-LoginFormView.propTypes = {
+LostPasswordFormView.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   serverErrorMessage: PropTypes.string,
 };
 
-const LoginForm = compose(
+const LostPasswordForm = compose(
   reduxForm({
-    form: 'login',
+    form: 'lost-password',
     validate: createValidator({
       email: [ requiredValidator, emailValidator ],
-      password: [ requiredValidator ],
     }),
   })
-)(LoginFormView);
+)(LostPasswordFormView);
 
-export default LoginForm;
+export default LostPasswordForm;

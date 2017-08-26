@@ -31,10 +31,6 @@ class LoginPage extends Component {
     dispatch: PropTypes.func.isRequired,
   }
 
-  static async getInitialProps() {
-    return {};
-  }
-
   submitLogin = ( values ) => {
     // const nextPath = this.props.url.query.next
     const nextPath = this.props.url.query.next;
@@ -47,15 +43,6 @@ class LoginPage extends Component {
       },
     ) );
   }
-
-  // componentWillReceiveProps() {
-  // }
-
-  // componentWillMount() {
-  // }
-
-  // componentDidMount() {
-  // }
 
   render() {
     const {
