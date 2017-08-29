@@ -81,9 +81,9 @@ export async function remove(req, res, next ) {
   debug('delete');
   const id = req.params.id;
   try {
-    await User.findOneAndRemove({ _id: id });
+    const deletedUser = await User.findOneAndRemove({ _id: id });
     res.json({
-      data: null,
+      data: deletedUser,
     });
   }
   catch (error) {

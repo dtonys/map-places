@@ -2,6 +2,8 @@ import { Router } from 'express';
 
 import * as placeController from 'controllers/place';
 import * as userController from 'controllers/user';
+import * as adminOnRestController from 'controllers/adminOnRest';
+import mongoose from 'mongoose';
 
 const router = new Router();
 
@@ -26,6 +28,41 @@ router.use( ( req, res, next ) => {
 
   next();
 });
+
+/*
+  `admin-on-rest` endpoints
+*/
+
+const allCollections = Object.keys(mongoose.connection.collections).join('|');
+
+// GET_LIST /<resource>?sort=['title','ASC']&range=[0, 24]&filter={title:'bar'}
+// GET_MANY /<resource>?filter={ids:[123,456,789]}
+// GET_MANY_REFERENCE /<resource>?filter={author_id:345}
+router.get(`/:resource(${allCollections})`, adminOnRestController.getList );
+// GET_ONE /<resource>/<id>
+router.get(`/:resource(${allCollections})/:id`, adminOnRestController.getOne );
+// CREATE /<resource>/<id>
+router.post(`/:resource(${allCollections})`, adminOnRestController.create );
+// UPDATE /<resource>/<id>
+router.put(`/:resource(${allCollections})/:id`, adminOnRestController.update );
+// DELETE /<resource>/<id>
+router.delete(`/:resource(${allCollections})/:id`, adminOnRestController._delete );
+
+// [
+//   'users',
+//   'places',
+//   'session',
+// ].forEach(( model ) => {
+//   router.get(`/${model}`, adminOnRestController.getList );
+//   router.get(`/${model}/:id`, adminOnRestController.getOne );
+//   router.post(`/${model}/:id`, adminOnRestController.create );
+//   router.put(`/${model}/:id`, adminOnRestController.update );
+//   router.delete(`/${model}/:id`, adminOnRestController._delete );
+// });
+
+
+// router.get('/users', adminOnRestController.getManyReference );
+
 
 // CRUD USER
 router.post('/api/users', userController.create );

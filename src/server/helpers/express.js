@@ -6,6 +6,7 @@ import favicon from 'serve-favicon';
 import pageRoutes from 'routes/pageRoutes';
 import api from 'api';
 import { renderEmail } from 'email/mailer';
+import createWebApiRequest from 'web-api/webApiRequest';
 
 import {
   APP_PORT,
@@ -40,7 +41,11 @@ export async function createExpressApp( next ) {
   server.use(cookieParser());
   server.use(bodyParser.json());
   server.use(bodyParser.urlencoded({ extended: true }));
-  // Session middleware
+
+  server.use(( req, res, next ) => {
+    res.locals.webApiRequest = createWebApiRequest(req);
+    next();
+  });
 
   server.use('/email/:mailName', renderEmail);
 
