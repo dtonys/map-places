@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-
+require('mongoose-schema-jsonschema')(mongoose);
 
 const UserSchema = new Schema({
   first_name: {
