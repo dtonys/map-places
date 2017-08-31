@@ -15,7 +15,7 @@ async function bootstrap() {
   mailer.initialize();
   const expressApp = await createExpressApp(next);
   const serverListener = await startExpressServer(expressApp);
-  console.log(`Server ready on http://localhost:${serverListener.address().port}`);  // eslint-disable-line no-console
+  console.log(`Server ready on http://localhost:${serverListener.address().port}`); // eslint-disable-line no-console
 }
 
 bootstrap();

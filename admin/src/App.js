@@ -11,7 +11,9 @@ import {
   UserList,
   UserEdit,
   UserCreate,
-} from './_users';
+} from './users';
+
+// import PlaceIcon from '../node-modules/material-ui/svg-icons/action/place';
 
 const httpClient = (url, options = {}) => {
   if (!options.headers) {
@@ -23,10 +25,6 @@ const httpClient = (url, options = {}) => {
 };
 
 class App extends Component {
-
-  componentDidMount() {
-
-  }
 
   render() {
     return (
