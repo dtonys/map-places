@@ -10,7 +10,7 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <html lang="en" style={{ overflow: 'hidden' }} >
+      <html lang="en" >
         <Head>
           <link rel="apple-touch-icon" sizes="57x57" href="/static/apple-icon-57x57.png" />
           <link rel="apple-touch-icon" sizes="60x60" href="/static/apple-icon-60x60.png" />

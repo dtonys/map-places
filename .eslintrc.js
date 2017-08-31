@@ -174,6 +174,7 @@ module.exports = {
   },
   "globals": {
     "GOOGLE_MAPS_API_KEY": true,
+    "SERVER_URL_BASE": true,
     "__CLIENT__": true,
     "__SERVER__": true,
     "__DEVELOPMENT__": true,

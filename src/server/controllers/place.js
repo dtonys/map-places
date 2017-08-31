@@ -69,9 +69,9 @@ export async function remove( req, res, next ) {
   debug('delete');
   const id = req.params.id;
   try {
-    await Place.findOneAndRemove({ _id: id });
+    const deletedPlace = await Place.findOneAndRemove({ _id: id });
     res.json({
-      data: null,
+      data: deletedPlace,
     });
   }
   catch (error) {

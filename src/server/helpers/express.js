@@ -1,16 +1,24 @@
 import path from 'path';
+
 import express from 'express';
+import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import favicon from 'serve-favicon';
+
 import pageRoutes from 'routes/pageRoutes';
 import api from 'api';
 import { renderEmail } from 'email/mailer';
 import createWebApiRequest from 'web-api/webApiRequest';
+import { SESSION_COOKIE_NAME } from 'models/session';
+import {
+  getCurrentSessionAndUser,
+} from 'helpers/session';
 
 import {
   APP_PORT,
   TEST_PORT,
+  ADMIN_PORT,
 } from 'constants';
 
 
@@ -30,13 +38,24 @@ export function startExpressServer(expressApp) {
   });
 }
 
-export async function createExpressApp( next ) {
+export async function createExpressApp( nextJS ) {
   debug('createExpressServer');
   const dev = process.env.NODE_ENV !== 'production';
-  const app = next({ dev });
+  const app = nextJS({ dev });
   const handler = pageRoutes.getRequestHandler(app);
 
   const server = express();
+
+  // Give admin app access to APIs
+  const corsOptions = {
+    origin: `http://localhost:${ADMIN_PORT}`,
+    credentials: true,
+    allowedHeaders: [ 'Content-Range', 'content-type', 'Cookie' ],
+    exposedHeaders: [ 'Content-Range', 'content-type', 'Cookie' ],
+  };
+  server.options('*', cors(corsOptions));
+  server.use(cors(corsOptions));
+
   server.use(favicon(path.resolve(__dirname, '../../../static/favicon.ico')));
   server.use(cookieParser());
   server.use(bodyParser.json());
@@ -45,6 +64,17 @@ export async function createExpressApp( next ) {
   server.use(( req, res, next ) => {
     res.locals.webApiRequest = createWebApiRequest(req);
     next();
+  });
+
+  // redirect `/admin` to admin hosted app
+  // TODO: Authentication for admin role, else redirect to login
+  server.get('/admin', async (req, res) => {
+    const { user, session } = await getCurrentSessionAndUser( req.cookies[SESSION_COOKIE_NAME] );
+    if ( !user || !session ) {
+      res.redirect(`/login?next=${encodeURIComponent('/admin')}`);
+      return;
+    }
+    res.redirect(`http://localhost:${ADMIN_PORT}`);
   });
 
   server.use('/email/:mailName', renderEmail);

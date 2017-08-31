@@ -1,6 +1,12 @@
+import mongoose from 'mongoose';
+
 import User from 'models/user';
 import Place from 'models/place';
-import Session from 'models/session';
+import Session, { SESSION_COOKIE_NAME } from 'models/session';
+import {
+  getCurrentSessionAndUser,
+} from 'helpers/session';
+
 
 const collectionToModelMap = {
   users: User,
@@ -110,15 +116,48 @@ export async function update( req, res ) {
 }
 
 // DELETE /<resource>/<id>
-export async function _delete( req, res ) {
+export async function _delete( req, res, next ) {
   // Proxy to delete user api
   const { webApiRequest } = res.locals;
   const id = req.params.id;
-  const deletedUser = await webApiRequest('DELETE', `/api/${req.params.resource}/${id}`);
-  const aorResponse = {
-    ...deletedUser.data,
-    id: deletedUser.data._id,
-  };
-  res.json(aorResponse);
+
+  try {
+    const deletedUser = await webApiRequest('DELETE', `/api/${req.params.resource}/${id}`);
+    const aorResponse = {
+      ...deletedUser.data,
+      id: deletedUser.data._id,
+    };
+    res.json(aorResponse);
+  }
+  catch (error) {
+    next(error);
+  }
 }
 
+export function addRoutes( router ) {
+  const allCollections = Object.keys(mongoose.connection.collections).join('|');
+
+  // Authenticate, check logged in statatus
+  // TODO add admin role based authentication
+  router.use('/aor-api/*', async (req, res, next) => {
+    const { user, session } = await getCurrentSessionAndUser( req.cookies[SESSION_COOKIE_NAME] );
+    if ( !user || !session ) {
+      res.redirect(`/login?next=${encodeURIComponent('/admin')}`);
+      return;
+    }
+    next();
+  });
+
+  // GET_LIST /<resource>?sort=['title','ASC']&range=[0, 24]&filter={title:'bar'}
+  // GET_MANY /<resource>?filter={ids:[123,456,789]}
+  // GET_MANY_REFERENCE /<resource>?filter={author_id:345}
+  router.get(`/aor-api/:resource(${allCollections})`, getList );
+  // GET_ONE /<resource>/<id>
+  router.get(`/aor-api/:resource(${allCollections})/:id`, getOne );
+  // CREATE /<resource>/<id>
+  router.post(`/aor-api/:resource(${allCollections})`, create );
+  // UPDATE /<resource>/<id>
+  router.put(`/aor-api/:resource(${allCollections})/:id`, update );
+  // DELETE /<resource>/<id>
+  router.delete(`/aor-api/:resource(${allCollections})/:id`, _delete );
+}

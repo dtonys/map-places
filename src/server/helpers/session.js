@@ -13,6 +13,9 @@ export function createSessionEncryptor() {
 }
 
 export async function getCurrentSessionAndUser( sessionId ) {
+  if ( !sessionId ) {
+    return { user: null, session: null };
+  }
   const userId = encryptor.decrypt(sessionId);
   const [ user, session ] = await Promise.all([
     User.findOne({ _id: userId }),
