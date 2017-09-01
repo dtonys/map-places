@@ -445,7 +445,6 @@ class PlotPlaces extends Component {
             <div className="rightRegion" id="mapRegion" >
             </div>
           </div>
-          {'Admin - Plot Places'}
         </div>
         <style jsx>{`
           .nav {
