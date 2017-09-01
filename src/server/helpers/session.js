@@ -60,12 +60,15 @@ export function createAuthMiddleware({
 }) {
   return async function authenticateOrRedirect( req, res, next ) {
     const { user } = await getCurrentSessionAndUser( req.cookies[SESSION_COOKIE_NAME] );
-    const userRoles = lodashGet( user, 'roles' );
-    const hasRequiredRoles = userRoles && lodashDifference(requiredRoles, userRoles).length === 0;
-    if ( hasRequiredRoles ) {
-      next();
-      return;
+    if ( requiredRoles ) {
+      const userRoles = lodashGet( user, 'roles' );
+      const hasRequiredRoles = userRoles && lodashDifference(requiredRoles, userRoles).length === 0;
+      if ( hasRequiredRoles ) {
+        next();
+        return;
+      }
     }
+
     if ( redirect ) {
       const nextPath = user ? '/' : `/login?next=${encodeURIComponent(req.originalUrl)}`;
       res.redirect(nextPath);

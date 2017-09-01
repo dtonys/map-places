@@ -50,7 +50,7 @@ export function setupMongoose(dbName) {
   registerMongooseModels();
 
   return new Promise(( resolve, reject ) => {
-    const connection = mongoose.connect(`mongodb://localhost/${dbName}`, {
+    const connection = mongoose.connect(`${process.env.MONGODB_CONNECTION_URL}/${dbName}`, {
       useMongoClient: true,
       promiseLibrary: global.Promise,
       config: {

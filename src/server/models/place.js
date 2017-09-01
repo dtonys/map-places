@@ -11,4 +11,4 @@ const PlaceSchema = new Schema({
 
 const Place  = mongoose.model('place', PlaceSchema);
 
-module.exports = Place;
+export default Place;
