@@ -11,17 +11,26 @@ import {
   UserList,
   UserEdit,
   UserCreate,
-} from './users';
-
-// import PlaceIcon from 'material-ui/svg-icons/maps/place';
+} from './resources/users';
+import {
+  PlaceList,
+  PlaceEdit,
+  PlaceCreate,
+} from './resources/places';
 import PersonIcon from 'material-ui/svg-icons/social/person';
+import PlaceIcon from 'material-ui/svg-icons/maps/place';
+// import SessionIcon from 'material-ui/svg-icons/action/compare-arrows';
 
 const httpClient = (url, options = {}) => {
   if (!options.headers) {
     options.headers = new Headers({ Accept: 'application/json' });
   }
-  // Pass this optoin into the `fetch` API to allow cookies to be sent to the server
+  // Pass this option into the `fetch` API to allow cookies to be sent to the server
   options.credentials = 'include';
+  console.log(`${options.method || ''} ${url}`);
+  if ( options.body ) {
+    console.log(`${options.body}`);
+  }
   return fetchUtils.fetchJson(url, options);
 };
 
@@ -36,10 +45,18 @@ class App extends Component {
         <Resource
           name="users"
           icon={PersonIcon}
-          edit={UserEdit}
-          create={UserCreate}
-          remove={Delete}
           list={UserList}
+          create={UserCreate}
+          edit={UserEdit}
+          remove={Delete}
+        />
+        <Resource
+          name="places"
+          icon={PlaceIcon}
+          list={PlaceList}
+          create={PlaceCreate}
+          edit={PlaceEdit}
+          remove={Delete}
         />
       </Admin>
     );

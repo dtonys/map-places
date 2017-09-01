@@ -1,10 +1,13 @@
 import mongoose from 'mongoose';
+import lodashIsEmpty from 'lodash/isEmpty';
 
-import User from 'models/user';
+import User, {
+  USER_ROLE_ADMIN,
+} from 'models/user';
 import Place from 'models/place';
-import Session, { SESSION_COOKIE_NAME } from 'models/session';
+import Session from 'models/session';
 import {
-  getCurrentSessionAndUser,
+  createAuthMiddleware,
 } from 'helpers/session';
 
 
@@ -30,8 +33,7 @@ export async function getList( req, res ) {
   eval(`filter = ${req.query.filter}`); // eslint-disable-line no-eval
 
   const queryObject = {};
-
-  if ( filter ) {
+  if ( filter && !lodashIsEmpty(filter) ) {
     // filter={ids:[123,456,789]}
     if ( filter.ids && filter.ids.length ) {
       queryObject['_id'] = { $in: filter.ids };
@@ -41,14 +43,22 @@ export async function getList( req, res ) {
     else {
       const filterKey = Object.keys(filter)[0];
       const filterValue = filter[filterKey];
-      queryObject[filterKey] = filterValue;
+      const filterValueRegex = new RegExp(filterValue, 'i');
+      queryObject[filterKey] = { $regex: filterValueRegex };
     }
+  }
+  if ( queryObject['id'] ) {
+    queryObject['_id'] = queryObject['id'];
+    delete queryObject['id'];
   }
   const queryPromise = Model.find(queryObject);
   // sort=['title','ASC']
   if ( sort ) {
-    const sortKey = sort[0];
+    let sortKey = sort[0];
     const sortValue = sort[1];
+    if ( sortKey === 'id' ) {
+      sortKey = '_id';
+    }
     queryPromise.sort({ [sortKey]: sortValueMap[sortValue] });
   }
   // range=[0, 24]
@@ -59,12 +69,12 @@ export async function getList( req, res ) {
     const perPage = endNum - startNum;
     queryPromise.skip(startNum);
     queryPromise.limit(perPage);
-
   }
   const [ resources, total ] = await Promise.all([
     queryPromise,
     Model.find(queryObject).count(),
   ]);
+
   // Content-Range: posts 0-24/319 <range>/<total>
   res.set('Content-Range', `${startNum}-${endNum}/${total}`);
   const _resources =  resources.map((resource) => {
@@ -139,15 +149,11 @@ export function addRoutes( router ) {
 
   // Authenticate, check logged in statatus
   // TODO add admin role based authentication
-  router.use('/aor-api/*', async (req, res, next) => {
-    const { user, session } = await getCurrentSessionAndUser( req.cookies[SESSION_COOKIE_NAME] );
-    if ( !user || !session ) {
-      res.redirect(`/login?next=${encodeURIComponent('/admin')}`);
-      return;
-    }
-    next();
+  const adminOnly = createAuthMiddleware({
+    requiredRoles: [ USER_ROLE_ADMIN ],
   });
 
+  router.use('/aor-api', adminOnly );
   // GET_LIST /<resource>?sort=['title','ASC']&range=[0, 24]&filter={title:'bar'}
   // GET_MANY /<resource>?filter={ids:[123,456,789]}
   // GET_MANY_REFERENCE /<resource>?filter={author_id:345}

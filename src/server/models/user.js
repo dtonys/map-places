@@ -1,6 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
 
 
+export const USER_ROLE_MEMBER = 'member';
+export const USER_ROLE_ADMIN = 'admin';
+
 const UserSchema = new Schema({
   first_name: {
     type: String,
@@ -22,6 +25,10 @@ const UserSchema = new Schema({
   is_email_verified: {
     type: Boolean,
     default: false,
+  },
+  roles: {
+    type: [ String ],
+    default: [],
   },
 });
 

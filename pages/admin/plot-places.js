@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import clientEntry from 'helpers/clientEntry';
 import attachRedux from 'helpers/attachRedux';
+import authenticatedPage from  'helpers/authenticatedPage';
 
 import PlacesAutocomplete, {
   geocodeByAddress,
@@ -42,6 +43,7 @@ const CONTENT_REGION_WIDTH = 960;
 
 @clientEntry()
 @attachRedux()
+@authenticatedPage({ requiredRoles: [ 'admin' ] })
 @connect(
   (globalState) => ({
     placesLoadedFromStorage: extractPlacesLoadedFromStorage(globalState),

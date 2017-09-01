@@ -1,4 +1,6 @@
 import createEncryptor from 'simple-encryptor';
+import lodashDifference from 'lodash/difference';
+import lodashGet from 'lodash/get';
 import Session, {
   SESSION_COOKIE_NAME,
   SESSION_DURATION_SECONDS,
@@ -11,6 +13,7 @@ let encryptor = null;
 export function createSessionEncryptor() {
   encryptor = createEncryptor( process.env.ENCRYPTION_SECRET );
 }
+
 
 export async function getCurrentSessionAndUser( sessionId ) {
   if ( !sessionId ) {
@@ -51,3 +54,26 @@ export async function createSessionWithCookie( userId, res ) {
   );
 }
 
+export function createAuthMiddleware({
+  requiredRoles,
+  redirect = false,
+}) {
+  return async function authenticateOrRedirect( req, res, next ) {
+    const { user } = await getCurrentSessionAndUser( req.cookies[SESSION_COOKIE_NAME] );
+    const userRoles = lodashGet( user, 'roles' );
+    const hasRequiredRoles = userRoles && lodashDifference(requiredRoles, userRoles).length === 0;
+    if ( hasRequiredRoles ) {
+      next();
+      return;
+    }
+    if ( redirect ) {
+      const nextPath = user ? '/' : `/login?next=${encodeURIComponent(req.originalUrl)}`;
+      res.redirect(nextPath);
+      return;
+    }
+    res.status(401);
+    res.json({
+      error: 'Unauthorized access',
+    });
+  };
+}

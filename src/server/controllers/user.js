@@ -1,4 +1,6 @@
-import User from 'models/user';
+import User, {
+  USER_ROLE_MEMBER,
+} from 'models/user';
 import bcrypt from 'bcrypt';
 
 import {
@@ -70,7 +72,6 @@ export async function list(req, res, next ) {
         items: users,
       },
     });
-    res.json(users);
   }
   catch (error) {
     next(error);
@@ -120,6 +121,7 @@ export async function signup( req, res, next ) {
       first_name: first_name,
       last_name: last_name,
       password_hash: passwordHash,
+      roles: [ USER_ROLE_MEMBER ],
     });
     // Send verification email
     mailer.verifySignupEmail( email );

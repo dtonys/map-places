@@ -10,9 +10,8 @@ import pageRoutes from 'routes/pageRoutes';
 import api from 'api';
 import { renderEmail } from 'email/mailer';
 import createWebApiRequest from 'web-api/webApiRequest';
-import { SESSION_COOKIE_NAME } from 'models/session';
 import {
-  getCurrentSessionAndUser,
+  createAuthMiddleware,
 } from 'helpers/session';
 
 import {
@@ -20,6 +19,9 @@ import {
   TEST_PORT,
   ADMIN_PORT,
 } from 'constants';
+import {
+  USER_ROLE_ADMIN,
+} from 'models/user';
 
 
 const debug = require('debug')('mp-helpers-express');
@@ -66,14 +68,14 @@ export async function createExpressApp( nextJS ) {
     next();
   });
 
+  const adminOrRedirect = createAuthMiddleware({
+    requiredRoles: [ USER_ROLE_ADMIN ],
+    redirect: true,
+  });
+
   // redirect `/admin` to admin hosted app
   // TODO: Authentication for admin role, else redirect to login
-  server.get('/admin', async (req, res) => {
-    const { user, session } = await getCurrentSessionAndUser( req.cookies[SESSION_COOKIE_NAME] );
-    if ( !user || !session ) {
-      res.redirect(`/login?next=${encodeURIComponent('/admin')}`);
-      return;
-    }
+  server.get('/admin', adminOrRedirect, async (req, res) => {
     res.redirect(`http://localhost:${ADMIN_PORT}`);
   });
 

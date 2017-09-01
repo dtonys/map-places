@@ -1,54 +1,49 @@
 import { Component } from 'react';
-import PropTypes from 'prop-types';
 import { wrapDisplayName } from 'recompose';
-import { connect } from 'react-redux';
+import lodashDifference from 'lodash/difference';
 
 import { Router } from 'routes/pageRoutes';
 
 import {
-  extractAuthenticated,
+  extractCurrentUser,
 } from 'redux-modules/reducers/user';
 
-// Ideas for options:
-// @authenticated( true )
-// @authenticated({ role: 'admin' })
-
-
-function AuthenticatedPageWithOptions( options ) {
+// @authenticated()
+// @authenticated({ requiredRoles: ['admin', 'member'] })
+function AuthenticatedPageWithOptions( options = {} ) {
 
   function AuthenticatedPage( WrappedComponent ) {
 
-    @connect(
-      (globalState) => ({
-        authenticated: extractAuthenticated(globalState),
-      })
-    )
     class AuthenticatedPageHOC extends Component {
-      static propTypes = {
-        authenticated: PropTypes.bool.isRequired,
-      }
-
-      static redirectToLogin( context ) {
+      static authRedirect( context, authenticated ) {
         if ( __SERVER__ ) {
           const { req, res } = context;
-          const nextPath = encodeURIComponent(req.originalUrl);
-          res.redirect(`/login?next=${nextPath}`);
+          const redirectPath = authenticated ? '/' : `/login?next=${encodeURIComponent(req.originalUrl)}`;
+          res.redirect(redirectPath);
         }
         if ( __CLIENT__ ) {
-          const nextPath = encodeURIComponent(context.asPath);
-          Router.replaceRoute(`/login?next=${nextPath}`);
+          const redirectPath = authenticated ? '/' : `/login?next=${encodeURIComponent(context.asPath)}`;
+          Router.replaceRoute(redirectPath);
         }
       }
 
       static async getInitialProps( context ) {
-        let wrappedComponentInitialProps = {};
         const { store } = context;
         const globalState = store.getState();
 
-        const userAuthenticated = extractAuthenticated(globalState);
-        if ( !userAuthenticated ) {
-          AuthenticatedPageHOC.redirectToLogin(context);
+        const currentUser = extractCurrentUser(globalState);
+        if ( !currentUser ) {
+          AuthenticatedPageHOC.authRedirect(context, false);
+          return {};
         }
+        if (
+          options.requiredRoles &&
+          lodashDifference(options.requiredRoles, currentUser.roles).length !== 0
+        ) {
+          AuthenticatedPageHOC.authRedirect(context, Boolean(currentUser));
+          return {};
+        }
+        let wrappedComponentInitialProps = {};
         if ( WrappedComponent.getInitialProps ) {
           wrappedComponentInitialProps = await WrappedComponent.getInitialProps(context);
         }
