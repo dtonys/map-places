@@ -50,7 +50,7 @@ export async function createExpressApp( nextJS ) {
 
   // Give admin app access to APIs
   const corsOptions = {
-    origin: `http://localhost:${ADMIN_PORT}`,
+    origin: process.env.ADMIN_PATH,
     credentials: true,
     allowedHeaders: [ 'Content-Range', 'content-type', 'Cookie' ],
     exposedHeaders: [ 'Content-Range', 'content-type', 'Cookie' ],
@@ -76,7 +76,7 @@ export async function createExpressApp( nextJS ) {
   // redirect `/admin` to admin hosted app
   // TODO: Authentication for admin role, else redirect to login
   server.get('/admin', adminOrRedirect, async (req, res) => {
-    res.redirect(`http://localhost:${ADMIN_PORT}`);
+    res.redirect(process.env.ADMIN_PATH);
   });
 
   server.use('/email/:mailName', renderEmail);
