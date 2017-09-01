@@ -39,7 +39,7 @@ class App extends Component {
   render() {
     return (
       <Admin
-        restClient={simpleRestClient('http://localhost:8050/aor-api', httpClient )}
+        restClient={simpleRestClient(`${process.env.REACT_APP_ADMIN_API_PATH}/aor-api`, httpClient )}
         title="MapPlaces Admin"
       >
         <Resource
