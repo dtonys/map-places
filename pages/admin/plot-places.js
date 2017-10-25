@@ -345,6 +345,7 @@ class PlotPlaces extends Component {
                       inputProps={autoCompleteInputProps}
                       onSelect={this.onAutoCompleteSelect}
                       styles={autoCompleteStyles}
+                      googleLogo={false}
                     />
                     { Boolean(autoCompleteAddress) &&
                       <div
