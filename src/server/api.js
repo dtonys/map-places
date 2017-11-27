@@ -43,7 +43,7 @@ const adminOnly = createAuthMiddleware({
   requiredRoles: [ USER_ROLE_ADMIN ],
 });
 // CRUD USER
-router.use('/api/users', adminOnly);
+// router.use('/api/users', adminOnly);
 router.post('/api/users', userController.create );
 router.patch('/api/users/:id', userController.update );
 router.put('/api/users/:id', userController.update );
@@ -52,7 +52,7 @@ router.get('/api/users', userController.list );
 router.delete('/api/users/:id', userController.remove );
 
 // CRUD PLACE
-router.use('/api/places', adminOnly);
+// router.use('/api/places', adminOnly);
 router.post('/api/places', placeController.create );
 router.patch('/api/places/:id', placeController.update );
 router.put('/api/places/:id', placeController.update );

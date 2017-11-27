@@ -16,6 +16,9 @@ import {
 } from 'helpers/express';
 import createWebApiRequest from 'web-api/webApiRequest';
 import loadEnv from '../../loadEnv';
+import {
+  TEST_PORT,
+} from 'constants';
 
 
 test.before('Bootstrap application in test mode', async () => {
@@ -38,7 +41,15 @@ test.beforeEach('Clear database state before each test', async ( t ) => {
 
   }
   await buildAllIndexes();
-  t.context.webApiRequest = createWebApiRequest();
+  const mockReq = {
+    protocol: 'http',
+    headers: {},
+    get: (str) => {
+      if ( str === 'host' ) return `localhost:${TEST_PORT}`;
+      return '';
+    },
+  };
+  t.context.webApiRequest = createWebApiRequest(mockReq);
 });
 
 test.serial('POST `/api/users` creates a new user', async (t) => {
@@ -141,7 +152,7 @@ test.serial('DELETE `/api/users/:id` deletes a user', async (t) => {
   const response = await webApiRequest(
     'DELETE', `/api/users/${user._id.toString()}`
   );
-  t.true( response.data === null, 'delete response has null data' );
+  t.true( response.data.first_name === 'delete_first', 'delete response returns the removed item' );
   const queriedUser = await User.findOne({ _id: user._id.toString() });
   t.true( queriedUser === null, 'database cannot get the deleted user');
 });

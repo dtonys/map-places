@@ -15,13 +15,16 @@ import {
 } from 'helpers/express';
 import createWebApiRequest from 'web-api/webApiRequest';
 import loadEnv from '../../loadEnv';
-
+import {
+  TEST_PORT,
+} from 'constants';
 
 test.before('Bootstrap application in test mode', async () => {
   loadEnv();
   await setupMongoose('mapplaces_test');
   const expressApp = await createExpressApp(nextMock);
   const serverListener = await startExpressServer(expressApp);
+
   console.log(`Server ready on http://localhost:${serverListener.address().port}`); // eslint-disable-line no-console
 });
 
@@ -37,7 +40,17 @@ test.beforeEach('Clear database state before each test', async ( t ) => {
 
   }
   await buildAllIndexes();
-  t.context.webApiRequest = createWebApiRequest();
+  const mockReq = {
+    protocol: 'http',
+    headers: {},
+    get: (str) => {
+      if ( str === 'host' ) return `localhost:${TEST_PORT}`;
+      return '';
+    },
+  };
+  // req.protocol == 'http://'
+  // req.get('host') 'localhost'
+  t.context.webApiRequest = createWebApiRequest(mockReq);
 });
 
 test.serial('POST `/api/places` creates a new place', async (t) => {
@@ -152,7 +165,7 @@ test.serial('DELETE `/api/places/:id` deletes a place', async (t) => {
   const response = await webApiRequest(
     'DELETE', `/api/places/${place._id.toString()}`
   );
-  t.true( response.data === null, 'delete response has null data' );
+  t.true( response.data.name === 'created_place', 'delete response returns the removed item' );
 
   const queriedUser = await Place.findOne({ _id: place._id.toString() });
   t.true( queriedUser === null, 'database cannot get the deleted user');
