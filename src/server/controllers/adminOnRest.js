@@ -149,11 +149,11 @@ export function addRoutes( router ) {
 
   // Authenticate, check logged in statatus
   // TODO add admin role based authentication
-  const adminOnly = createAuthMiddleware({
-    requiredRoles: [ USER_ROLE_ADMIN ],
-  });
+  // const adminOnly = createAuthMiddleware({
+  //   requiredRoles: [ USER_ROLE_ADMIN ],
+  // });
 
-  router.use('/aor-api', adminOnly );
+  // router.use('/aor-api', adminOnly );
   // GET_LIST /<resource>?sort=['title','ASC']&range=[0, 24]&filter={title:'bar'}
   // GET_MANY /<resource>?filter={ids:[123,456,789]}
   // GET_MANY_REFERENCE /<resource>?filter={author_id:345}
