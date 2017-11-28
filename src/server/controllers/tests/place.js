@@ -1,9 +1,10 @@
 import test from 'ava';
 import mongoose from 'mongoose';
+import getPort from 'get-port';
 
 import {
   nextMock,
-} from 'helpers/test';
+} from 'helpers/nextMock';
 import {
   setupMongoose,
   buildAllIndexes,
@@ -13,22 +14,27 @@ import {
   createExpressApp,
   startExpressServer,
 } from 'helpers/express';
-import createWebApiRequest from 'web-api/webApiRequest';
+import { createMockWebApiRequest } from 'web-api/webApiRequest';
 import loadEnv from '../../loadEnv';
-import {
-  TEST_PORT,
-} from 'constants';
 
+
+let webApiRequest = null;
 test.before('Bootstrap application in test mode', async () => {
+  const port = await getPort();
   loadEnv();
-  await setupMongoose('mapplaces_test');
+  await setupMongoose(`mapplaces_test_${port}`);
   const expressApp = await createExpressApp(nextMock);
-  const serverListener = await startExpressServer(expressApp);
-
-  console.log(`Server ready on http://localhost:${serverListener.address().port}`); // eslint-disable-line no-console
+  await startExpressServer(expressApp, port);
+  console.log(`Server ready on http://localhost:${port}`); // eslint-disable-line no-console
+  webApiRequest = createMockWebApiRequest(port);
 });
 
-test.beforeEach('Clear database state before each test', async ( t ) => {
+test.after('Delete the temp database created', async () => {
+  console.log('dropping database');
+  await mongoose.connection.db.dropDatabase();
+});
+
+test.beforeEach('Clear database state before each test', async (/* t */) => {
   const db = mongoose.connection;
   for ( const collectionName of Object.keys(db.collections) ) {
     try {
@@ -40,21 +46,9 @@ test.beforeEach('Clear database state before each test', async ( t ) => {
 
   }
   await buildAllIndexes();
-  const mockReq = {
-    protocol: 'http',
-    headers: {},
-    get: (str) => {
-      if ( str === 'host' ) return `localhost:${TEST_PORT}`;
-      return '';
-    },
-  };
-  // req.protocol == 'http://'
-  // req.get('host') 'localhost'
-  t.context.webApiRequest = createWebApiRequest(mockReq);
 });
 
 test.serial('POST `/api/places` creates a new place', async (t) => {
-  const { webApiRequest }  = t.context;
   const testPlacePayload = {
     coordinates: [
       100.01,
@@ -74,7 +68,6 @@ test.serial('POST `/api/places` creates a new place', async (t) => {
 });
 
 test.serial('PATCH `/api/places/:id` updates a place', async (t) => {
-  const { webApiRequest }  = t.context;
   const testPlacePayload = {
     coordinates: [
       100.01,
@@ -98,7 +91,6 @@ test.serial('PATCH `/api/places/:id` updates a place', async (t) => {
 });
 
 test.serial('GET `/api/places/:id` gets a place', async (t) => {
-  const { webApiRequest }  = t.context;
   const testPlacePayload = {
     coordinates: [
       100.01,
@@ -117,7 +109,6 @@ test.serial('GET `/api/places/:id` gets a place', async (t) => {
 });
 
 test.serial('GET `/api/places` gets a list of places', async (t) => {
-  const { webApiRequest }  = t.context;
   const testPlacePayload1 = {
     coordinates: [
       100.01,
@@ -151,7 +142,6 @@ test.serial('GET `/api/places` gets a list of places', async (t) => {
 });
 
 test.serial('DELETE `/api/places/:id` deletes a place', async (t) => {
-  const { webApiRequest }  = t.context;
   const testPlacePayload = {
     coordinates: [
       100.01,

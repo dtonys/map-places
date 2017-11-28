@@ -26,11 +26,11 @@ import {
 
 const debug = require('debug')('mp-helpers-express');
 
-export function startExpressServer(expressApp) {
+export function startExpressServer(expressApp, port = '3000') {
   debug('startExpressServer');
-  const port = __TEST__ ? TEST_PORT : APP_PORT;
   return new Promise(( resolve, reject ) => {
-    const listener = expressApp.listen(port, (err) => {
+    let listener = null;
+    listener = expressApp.listen(port, (err) => {
       if (err) {
         reject(err);
         return;

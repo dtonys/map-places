@@ -1,10 +1,11 @@
 import superagent from 'superagent';
-
+import { TEST_PORT } from 'constants';
 export const UNKNOWN_ERROR = 'UNKNOWN_ERROR';
 export const NETWORK_ERROR = 'NETWORK_ERROR';
 export const RESPONSE_BODY_PARSE_FAIL_ERROR = 'RESPONSE_BODY_PARSE_FAIL';
 export const HTTP_STATUS_ERROR = 'HTTP_STATUS_ERROR';
 export const SERVER_VALIDATION_ERROR = 'SERVER_VALIDATION_ERROR';
+
 
 export const WEB_API_ERROR_TYPES = [
   UNKNOWN_ERROR,
@@ -142,6 +143,18 @@ function webApiRequest( req, method, path, params = {} ) {
       resolve( responseBody );
     });
   });
+}
+
+export function createMockWebApiRequest( port ) {
+  const mockReq = {
+    protocol: 'http',
+    headers: {},
+    get: (str) => {
+      if ( str === 'host' ) return `localhost:${port || TEST_PORT}`;
+      return '';
+    },
+  };
+  return webApiRequest.bind(null, mockReq);
 }
 
 export default function createWebApiRequest( req ) {

@@ -1,10 +1,10 @@
 import test from 'ava';
 import mongoose from 'mongoose';
-
+import getPort from 'get-port';
 
 import {
   nextMock,
-} from 'helpers/test';
+} from 'helpers/nextMock';
 import {
   setupMongoose,
   buildAllIndexes,
@@ -14,22 +14,27 @@ import {
   createExpressApp,
   startExpressServer,
 } from 'helpers/express';
-import createWebApiRequest from 'web-api/webApiRequest';
+import { createMockWebApiRequest } from 'web-api/webApiRequest';
 import loadEnv from '../../loadEnv';
-import {
-  TEST_PORT,
-} from 'constants';
 
 
+let webApiRequest = null;
 test.before('Bootstrap application in test mode', async () => {
+  const port = await getPort();
   loadEnv();
-  await setupMongoose('mapplaces_test');
+  await setupMongoose(`mapplaces_test_${port}`);
   const expressApp = await createExpressApp(nextMock);
-  const serverListener = await startExpressServer(expressApp);
-  console.log(`Server ready on http://localhost:${serverListener.address().port}`); // eslint-disable-line no-console
+  await startExpressServer(expressApp, port);
+  console.log(`Server ready on http://localhost:${port}`); // eslint-disable-line no-console
+  webApiRequest = createMockWebApiRequest(port);
 });
 
-test.beforeEach('Clear database state before each test', async ( t ) => {
+test.after('Delete the temp database created', async () => {
+  console.log('dropping database');
+  await mongoose.connection.db.dropDatabase();
+});
+
+test.beforeEach('Clear database state before each test', async ( /* t */ ) => {
   const db = mongoose.connection;
   for ( const collectionName of Object.keys(db.collections) ) {
     try {
@@ -41,19 +46,9 @@ test.beforeEach('Clear database state before each test', async ( t ) => {
 
   }
   await buildAllIndexes();
-  const mockReq = {
-    protocol: 'http',
-    headers: {},
-    get: (str) => {
-      if ( str === 'host' ) return `localhost:${TEST_PORT}`;
-      return '';
-    },
-  };
-  t.context.webApiRequest = createWebApiRequest(mockReq);
 });
 
 test.serial('POST `/api/users` creates a new user', async (t) => {
-  const { webApiRequest }  = t.context;
   const testUserPayload = {
     first_name: 'created_first',
     last_name: 'created_last',
@@ -71,7 +66,6 @@ test.serial('POST `/api/users` creates a new user', async (t) => {
 });
 
 test.serial('PATCH `/api/users/:id` updates a user', async (t) => {
-  const { webApiRequest }  = t.context;
   const testUserPayload = {
     first_name: 'original_first',
     last_name: 'original_last',
@@ -93,7 +87,6 @@ test.serial('PATCH `/api/users/:id` updates a user', async (t) => {
 });
 
 test.serial('GET `/api/users/:id` gets a user', async (t) => {
-  const { webApiRequest }  = t.context;
   const testUserPayload = {
     first_name: 'get_first',
     last_name: 'get_last',
@@ -110,7 +103,6 @@ test.serial('GET `/api/users/:id` gets a user', async (t) => {
 });
 
 test.serial('GET `/api/users` gets a list of users', async (t) => {
-  const { webApiRequest }  = t.context;
   const testUserPayload1 = {
     first_name: '1_first',
     last_name: '1_last',
@@ -140,7 +132,6 @@ test.serial('GET `/api/users` gets a list of users', async (t) => {
 });
 
 test.serial('DELETE `/api/users/:id` deletes a user', async (t) => {
-  const { webApiRequest }  = t.context;
   const testUserPayload = {
     first_name: 'delete_first',
     last_name: 'delete_last',
