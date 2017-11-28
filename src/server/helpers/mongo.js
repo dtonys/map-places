@@ -44,7 +44,7 @@ export function buildAllIndexes() {
 
 export function setupMongoose(dbName) {
   debug('setupMongoose');
-  mongoose.set('debug', true);
+  mongoose.set('debug', false);
   mongoose.Promise = global.Promise;
 
   registerMongooseModels();
