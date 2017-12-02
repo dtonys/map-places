@@ -34,6 +34,17 @@ class LoginPage extends Component {
   submitLogin = ( values ) => {
     // const nextPath = this.props.url.query.next
     const nextPath = this.props.url.query.next;
+    // TODO(@dtonys): Consider directly dispatching actions
+    // this.props.dispatch({
+    //   type: request(ACTION_LOGIN),
+    //   payload: {
+    //     email: values.email,
+    //     password: values.password,
+    //     nextPath: nextPath,
+    //   },
+    //   meta: {},
+    // });
+
     this.props.dispatch( makeAction(
       request(ACTION_LOGIN),
       {

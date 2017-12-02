@@ -1,43 +1,25 @@
-import mongoose from 'mongoose';
 import getPort from 'get-port';
-
-import {
-  nextMock,
-} from 'helpers/nextMock';
-import {
-  setupMongoose,
-  buildAllIndexes,
-} from 'helpers/mongo';
 import Place from 'models/place';
 import {
-  createExpressApp,
-  startExpressServer,
-} from 'helpers/express';
-import { createMockWebApiRequest } from 'web-api/webApiRequest';
-import loadEnv from '../../loadEnv';
-
+  setupTestEnvironment,
+  teardownTestEnvironment,
+} from 'helpers/testUtils';
 
 describe('User API tests', () => {
 
   let webApiRequest = null;
+  let port = null;
 
   // Bootstrap application in test mode
   beforeAll(async (done) => {
-    const port = await getPort();
-    loadEnv();
-    await setupMongoose(`mapplaces_test_${port}`);
-    await buildAllIndexes();
-    const expressApp = await createExpressApp(nextMock);
-    await startExpressServer(expressApp, port);
-    console.log(`Server ready on http://localhost:${port}`); // eslint-disable-line no-console
-    webApiRequest = createMockWebApiRequest(port);
+    port = await getPort();
+    webApiRequest = await setupTestEnvironment(port);
     done();
   });
 
   // Drop temp test database
   afterAll( async (done) => {
-    console.log('dropping database');
-    await mongoose.connection.db.dropDatabase();
+    teardownTestEnvironment(port);
     done();
   });
 

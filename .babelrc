@@ -1,5 +1,6 @@
 {
   "presets": [
+    "next/babel",
     "env",
     "stage-1"
   ],
@@ -14,25 +15,5 @@
         ]
       }
     ]
-  ],
-  "ignore": [
-    "node_modules"
-  ],
-  "env": {
-    "development": {
-      "presets": [
-        "next/babel"
-      ]
-    },
-    "production": {
-      "presets": [
-        "next/babel"
-      ]
-    },
-    "test": {
-      "presets": [
-        "react"
-      ]
-    }
-  }
+  ]
 }
