@@ -18,7 +18,7 @@
     "analyze": "cross-env ANALYZE=1 next build",
     "test": "cross-env NODE_ENV=test DEBUG=mp* ava --serial --watch --verbose",
     "test-jest": "jest --config ./jest.config.js --watch",
-    "test-all": "jest --config ./jest.config.js",
+    "test-all": "jest --config ./jest.config.js  --coverage",
     "console": "cross-env DEBUG=mp* babel-node ./bin/run-console.js"
   },
   "ava": {
