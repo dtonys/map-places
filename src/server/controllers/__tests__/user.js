@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 import getPort from 'get-port';
 import User from 'models/user';
 import {
