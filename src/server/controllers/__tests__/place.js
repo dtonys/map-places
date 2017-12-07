@@ -9,7 +9,7 @@ import {
   teardownTestEnvironment,
 } from 'helpers/testUtils';
 
-describe('User API tests', () => {
+describe('Place API tests', () => {
 
   let webApiRequest = null;
   let port = null;

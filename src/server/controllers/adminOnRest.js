@@ -2,13 +2,13 @@ import mongoose from 'mongoose';
 import lodashIsEmpty from 'lodash/isEmpty';
 
 import User, {
-  USER_ROLE_ADMIN,
+// USER_ROLE_ADMIN,
 } from 'models/user';
 import Place from 'models/place';
 import Session from 'models/session';
-import {
-  createAuthMiddleware,
-} from 'helpers/session';
+// import {
+//   createAuthMiddleware,
+// } from 'helpers/session';
 
 
 const collectionToModelMap = {
@@ -28,9 +28,12 @@ export async function getList( req, res ) {
   const sort = null;
   const range = null;
   const filter = null;
+  // NOTE: eval is used to parse arrays and objects in such a format
+  // Ex: sort=['title','ASC']&filter={title:'bar'}
   eval(`sort = ${req.query.sort}`); // eslint-disable-line no-eval
   eval(`range = ${req.query.range}`); // eslint-disable-line no-eval
   eval(`filter = ${req.query.filter}`); // eslint-disable-line no-eval
+
 
   const queryObject = {};
   if ( filter && !lodashIsEmpty(filter) ) {
