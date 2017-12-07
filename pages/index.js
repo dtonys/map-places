@@ -168,7 +168,7 @@ class HomePage extends Component {
             */}
           </div>
           <div className="mapContent">
-            {/* Map is inserted here dont put any children */}
+            {/* Map is inserted here, don't put any children */}
             <div id="mapRegion" className="mapRegion" />
           </div>
         </Layout>

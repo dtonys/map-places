@@ -13,7 +13,7 @@ const createExposedPromise = () => {
   return [ promise, deferred ];
 };
 
-export default store => next => action => {
+export default (/* store */) => (next) => (action) => {
   if ( !(action.meta && action.meta.deferred) ) {
     return next(action);
   }

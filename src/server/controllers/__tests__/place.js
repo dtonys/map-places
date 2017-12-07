@@ -22,7 +22,7 @@ describe('User API tests', () => {
   });
 
   // Drop temp test database
-  afterAll( async (done) => {
+  afterAll(async (done) => {
     teardownTestEnvironment(port);
     done();
   });

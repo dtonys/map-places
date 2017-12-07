@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development DEBUG=mp* npm-run-all --parallel dev-web dev-admin",
-    "dev-test": "node ./bin/run-server.js && node ./bin/run-post.js",
-    "dev-web": "cross-env NODE_ENV=development DEBUG=mp* babel-watch -D --delay 5 -w ./src/common -w ./src/server ./src/server/server.js",
+    "dev-web": "cross-env NODE_ENV=development DEBUG=mp* MONGODB_DEBUG=1 babel-watch -D --delay 5 -w ./src/common -w ./src/server ./src/server/server.js",
     "dev-admin": "cd admin && cross-env PORT=8060 node scripts/start.js",
     "build": "cross-env NODE_ENV=production npm-run-all build-web build-admin",
     "build-web": "cross-env NODE_ENV=production next build",

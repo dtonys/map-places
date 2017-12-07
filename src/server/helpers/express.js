@@ -15,11 +15,6 @@ import {
 } from 'helpers/session';
 
 import {
-  APP_PORT,
-  TEST_PORT,
-  ADMIN_PORT,
-} from 'constants';
-import {
   USER_ROLE_ADMIN,
 } from 'models/user';
 
