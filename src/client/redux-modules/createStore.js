@@ -7,7 +7,7 @@ import createSagaMiddleware from 'redux-saga';
 import rootReducer from 'redux-modules/rootReducer';
 import sagaPromiseMiddleware from 'redux-modules/middleware/sagaPromiseMiddleware';
 
-function createStore( initialState ) {
+function createStore( initialState = {} ) {
   const middleware = [];
 
   if ( __DEVELOPMENT__ ) {

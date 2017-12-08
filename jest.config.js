@@ -21,4 +21,5 @@ module.exports = {
   // },
   rootDir: './src',
   testEnvironment: 'node',
+  testPathIgnorePatterns: [ '<rootDir>/.next/', '<rootDir>/node_modules/' ],
 };
