@@ -11,13 +11,13 @@ import {
 
 describe('Place API tests', () => {
 
-  let webApiRequest = null;
+  let request = null;
   let port = null;
 
   // Bootstrap application in test mode
   beforeAll(async (done) => {
     port = await getPort();
-    webApiRequest = await setupTestEnvironment(port);
+    request = await setupTestEnvironment(port);
     done();
   });
 
@@ -35,7 +35,7 @@ describe('Place API tests', () => {
       ],
       name: 'created_place',
     };
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'POST', '/api/places', {
         body: testPlacePayload,
       }
@@ -43,6 +43,7 @@ describe('Place API tests', () => {
     expect(response.data.name).toBe(testPlacePayload.name);
     const queriedPlace = await Place.findOne({ _id: response.data._id });
     expect(queriedPlace.name).toBe(testPlacePayload.name);
+    expect(true).toBe(true);
   });
 
   test('PATCH `/api/places/:id` updates a place', async () => {
@@ -57,7 +58,7 @@ describe('Place API tests', () => {
     const updates = {
       name: 'updated_name',
     };
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'PATCH', `/api/places/${createdPlace._id.toString()}`, {
         body: updates,
       }
@@ -77,7 +78,7 @@ describe('Place API tests', () => {
       name: 'created_place',
     };
     const createdPlace = await Place.create(testPlacePayload);
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'GET', `/api/places/${createdPlace._id.toString()}`
     );
     expect(response.data.name).toBe(testPlacePayload.name);
@@ -100,12 +101,11 @@ describe('Place API tests', () => {
       ],
       name: 'created_place_2',
     };
-
     await Promise.all([
       Place.create(testPlacePayload1),
       Place.create(testPlacePayload2),
     ]);
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'GET', '/api/places'
     );
     expect(response.data.items.length >= 2).toBe(true);
@@ -127,7 +127,7 @@ describe('Place API tests', () => {
     const place = await Place.create(testPlacePayload);
     const newPlace = await Place.findOne({ _id: place._id.toString() });
     expect( newPlace !== null ).toBe(true);
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'DELETE', `/api/places/${place._id.toString()}`
     );
     expect( response.data.name === 'created_place' ).toBe(true);

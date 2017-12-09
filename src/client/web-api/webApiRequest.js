@@ -1,4 +1,5 @@
 import superagent from 'superagent';
+import lodashGet from 'lodash/get';
 import { TEST_PORT } from 'constants';
 export const UNKNOWN_ERROR = 'UNKNOWN_ERROR';
 export const NETWORK_ERROR = 'NETWORK_ERROR';
@@ -90,74 +91,91 @@ function webApiHandleError( networkError, response, responseBody ) {
   return false;
 }
 
-function webApiRequest( req, method, path, params = {} ) {
-  return new Promise(( resolve, reject ) => {
-    let updatedPath = path;
-    if ( __SERVER__ ) {
-      updatedPath = `${req.protocol}://${req.get('host')}${path}`;
-    }
+export function createRequest({
+  req,
+  basePath,
+  extendPromise,
+}) {
+  // get base path
+  let requestPathBase = '';
+  if ( basePath ) {
+    requestPathBase = basePath;
+  }
+  if ( req ) {
+    requestPathBase = `${req.protocol}://${req.get('host')}`;
+  }
+  // return requester function
+  return function apiRequest( method, path, params = {} ) {
 
-    debug(`${method} : ${updatedPath}`);
-    const request = superagent( method, updatedPath);
-    // NOTE: Disable error on HTTP 4xx or 5xx. This means:
-    // - `networkError` will only be populated if `resonse.text` is falsey
-    // - Only one of `networkError` or `response` will be set in the callback, never both.
-    request.ok((response) => Boolean(response && response.text) );
+    const requestPromise = new Promise((resolve, reject) => {
+      const requestPath = requestPathBase + path;
+      const request = superagent( method, requestPath );
+      // NOTE: Disable error on HTTP 4xx or 5xx. This means:
+      // - `networkError` will only be populated if `resonse.text` is falsey
+      // - Only one of `networkError` or `response` will be set in the callback, never both.
+      request.ok((response) => Boolean(response && response.text) );
 
-    // Transfer cookies from the client to the API, for page loads invoking server rendered API calls.
-    if ( __SERVER__ ) {
-      const cookieHeader = req.headers.cookie;
-      if (cookieHeader) {
-        request.set('cookie', cookieHeader);
+      // For server side requests, pass the cookie from the express `req`
+      // to our current request's headers
+      if ( req && lodashGet(req, 'headers.cookie') ) {
+        request.set('cookie', req.headers.cookie);
       }
-    }
-
-
-    if ( params && params.query ) {
-      request.query(params.query);
-    }
-    if ( params && params.body ) {
-      request.send(params.body);
-    }
-
-    request.end(( networkError, response ) => {
-      if ( !response ) {
-        const error = webApiHandleError(networkError, null, null);
-        reject( error );
-        return;
+      if ( params.query ) {
+        request.query(params.query);
       }
-      // Parse response text to JS object.  Relying on superagent's `request.body` can be error prone,
-      // it may return `null` or `{}` on a failed body parse.
-      let responseBody = null;
-      try {
-        responseBody = JSON.parse(response.text);
+      if ( params.body ) {
+        request.send(params.body);
       }
-      catch ( exception ) {
-        // IGNORE EXCEPTION
-      }
-      const error = webApiHandleError( networkError, response, responseBody );
-      if ( error ) {
-        reject( error );
-        return;
-      }
-      resolve( responseBody );
+      request.end(( networkError, response ) => {
+        if ( networkError ) {
+          reject(networkError);
+        }
+        resolve(response);
+      });
     });
+    // Add additional `.then` / `.catch` to continue processing the response
+    if ( extendPromise ) {
+      extendPromise(requestPromise);
+    }
+    return requestPromise;
+  };
+}
+
+function webApiParseBody(response) {
+  return new Promise((resolve, reject) => {
+    let responseBody = null;
+    try {
+      responseBody = JSON.parse(response.text);
+    }
+    catch ( exception ) {
+      // IGNORE EXCEPTION
+    }
+    const error = webApiHandleError( null, response, responseBody );
+    if ( error ) {
+      reject(error);
+      return;
+    }
+    resolve(responseBody);
   });
 }
 
-export function createMockWebApiRequest( port ) {
-  const mockReq = {
-    protocol: 'http',
-    headers: {},
-    get: (str) => {
-      if ( str === 'host' ) return `localhost:${port || TEST_PORT}`;
-      return '';
-    },
-  };
-  return webApiRequest.bind(null, mockReq);
+function webApiParseResponse( requestPromise ) {
+  requestPromise
+    .then(
+      webApiParseBody,
+      (networkError) => {
+        return Promise.reject( webApiHandleError(networkError, null, null) );
+      }
+    );
 }
 
-export default function createWebApiRequest( req ) {
-  return webApiRequest.bind(null, req);
+export function createWebApiRequest({
+  req,
+  basePath,
+} = {}) {
+  return createRequest({
+    req,
+    basePath,
+    extendPromise: webApiParseResponse,
+  });
 }
-

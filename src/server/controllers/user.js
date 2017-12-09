@@ -125,7 +125,6 @@ export async function signup( req, res, next ) {
     });
     // Send verification email
     mailer.verifySignupEmail( email );
-    // mailer.verifySignup
     // log user in
     await createSessionWithCookie( user._id.toString(), res );
     // return user

@@ -17,7 +17,7 @@ import {
   ACTION_INCREMENT_COUNTER,
 } from 'redux-modules/actions/counter';
 
-import createWebApiRequest from 'web-api/webApiRequest';
+import { createWebApiRequest } from 'web-api/webApiRequest';
 
 
 let clientStore = null;
@@ -44,9 +44,10 @@ function AttachReduxWithArgs(/* args */) {
 
         if ( __SERVER__ ) {
           const { req } = context;
+
           const { store, sagaMiddleware } = createStore();
           serverStore = store;
-          const webApiRequest = createWebApiRequest(req);
+          const webApiRequest = createWebApiRequest({ req });
           rootTask = sagaMiddleware.run(rootSaga, webApiRequest);
           serverStore.dispatch( makeAction(
             execute(ACTION_INCREMENT_COUNTER)

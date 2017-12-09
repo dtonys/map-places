@@ -9,7 +9,7 @@ import favicon from 'serve-favicon';
 import pageRoutes from 'routes/pageRoutes';
 import api from 'api';
 import { renderEmail } from 'email/mailer';
-import createWebApiRequest from 'web-api/webApiRequest';
+import { createWebApiRequest } from 'web-api/webApiRequest';
 import {
   createAuthMiddleware,
 } from 'helpers/session';
@@ -59,7 +59,7 @@ export async function createExpressApp( nextJS ) {
   server.use(bodyParser.urlencoded({ extended: true }));
 
   server.use(( req, res, next ) => {
-    res.locals.webApiRequest = createWebApiRequest(req);
+    res.locals.webApiRequest = createWebApiRequest({ req });
     next();
   });
 

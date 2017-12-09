@@ -12,13 +12,13 @@ import {
 
 describe('User API tests', () => {
 
-  let webApiRequest = null;
+  let request = null;
   let port = null;
 
   // Bootstrap application in test mode
   beforeAll(async (done) => {
     port = await getPort();
-    webApiRequest = await setupTestEnvironment(port);
+    request = await setupTestEnvironment(port);
     done();
   });
 
@@ -34,7 +34,7 @@ describe('User API tests', () => {
       last_name: 'created_last',
       email: 'created_user@test.com',
     };
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'POST', '/api/users', {
         body: testUserPayload,
       }
@@ -55,7 +55,7 @@ describe('User API tests', () => {
     const updates = {
       first_name: 'updated_first',
     };
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'PATCH', `/api/users/${createdUser._id.toString()}`, {
         body: updates,
       },
@@ -72,7 +72,7 @@ describe('User API tests', () => {
       email: 'get_user@test.com',
     };
     const createdUser = await User.create(testUserPayload);
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'GET', `/api/users/${createdUser._id.toString()}`
     );
     expect( response.data.first_name ).toBe(testUserPayload.first_name);
@@ -95,7 +95,7 @@ describe('User API tests', () => {
       User.create(testUserPayload1),
       User.create(testUserPayload2),
     ]);
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'GET', '/api/users'
     );
     expect(response.data.items.length >= 2).toBe(true);
@@ -116,7 +116,7 @@ describe('User API tests', () => {
     const user = await User.create(testUserPayload);
     const newUser = await User.findOne({ _id: user._id.toString() });
     expect(newUser !== null).toBe(true);
-    const response = await webApiRequest(
+    const { body: response } = await request(
       'DELETE', `/api/users/${user._id.toString()}`
     );
     expect( response.data.first_name === 'delete_first' ).toBe(true);
