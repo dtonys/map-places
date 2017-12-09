@@ -36,16 +36,17 @@ describe('Auth API tests', () => {
         "last_name": "test3_last"
       };
 
-      const { body: response } = await request(
+      const response = await request(
         'POST', '/api/signup', {
           body: userPayload,
         }
       );
       delete userPayload.password;
       // Creates a new user
-      expect(response.data).toMatchObject(userPayload);
-      expect(response.data.password_hash).toBeTruthy();
-      expect(response.data.is_email_verified).toBe(false);
+      expect(response.body.data).toMatchObject(userPayload);
+      expect(response.body.data.password_hash).toBeTruthy();
+      expect(response.body.data.is_email_verified).toBe(false);
+
       // Sends a verify email
       // maildev.on('new', function(email){
       //   console.log('Received new email with subject: %s', email.subject);

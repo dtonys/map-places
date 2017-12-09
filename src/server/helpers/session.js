@@ -48,7 +48,7 @@ export async function createSessionWithCookie( userId, res ) {
     SESSION_COOKIE_NAME,
     createdSession._id,
     {
-      httpOnly: true,
+      httpOnly: true, // Prevent client side javascript from reading cookie
       maxAge: 1000 * SESSION_DURATION_SECONDS,
     }
   );

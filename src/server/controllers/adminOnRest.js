@@ -94,10 +94,10 @@ export async function getOne( req, res ) {
   const { webApiRequest } = res.locals;
   const id = req.params.id;
   // Proxy to get user detail api
-  const user = await webApiRequest('GET', `/api/${req.params.resource}/${id}` );
+  const responseBody = await webApiRequest('GET', `/api/${req.params.resource}/${id}` );
   const aorResponse = {
-    ...user.data,
-    id: user.data._id,
+    ...responseBody.data,
+    id: responseBody.data._id,
   };
   res.json(aorResponse);
 }

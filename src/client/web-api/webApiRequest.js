@@ -7,7 +7,6 @@ export const RESPONSE_BODY_PARSE_FAIL_ERROR = 'RESPONSE_BODY_PARSE_FAIL';
 export const HTTP_STATUS_ERROR = 'HTTP_STATUS_ERROR';
 export const SERVER_VALIDATION_ERROR = 'SERVER_VALIDATION_ERROR';
 
-
 export const WEB_API_ERROR_TYPES = [
   UNKNOWN_ERROR,
   NETWORK_ERROR,
@@ -94,7 +93,8 @@ function webApiHandleError( networkError, response, responseBody ) {
 export function createRequest({
   req,
   basePath,
-  extendPromise,
+  extendPromiseResolve = ((val) => Promise.resolve(val)),
+  extendPromiseReject = ((err) => Promise.reject(err)),
 }) {
   // get base path
   let requestPathBase = '';
@@ -107,7 +107,7 @@ export function createRequest({
   // return requester function
   return function apiRequest( method, path, params = {} ) {
 
-    const requestPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const requestPath = requestPathBase + path;
       const request = superagent( method, requestPath );
       // NOTE: Disable error on HTTP 4xx or 5xx. This means:
@@ -132,41 +132,31 @@ export function createRequest({
         }
         resolve(response);
       });
-    });
-    // Add additional `.then` / `.catch` to continue processing the response
-    if ( extendPromise ) {
-      extendPromise(requestPromise);
-    }
-    return requestPromise;
+    })
+      .then(
+        extendPromiseResolve,
+        extendPromiseReject,
+      );
   };
 }
 
-function webApiParseBody(response) {
-  return new Promise((resolve, reject) => {
-    let responseBody = null;
-    try {
-      responseBody = JSON.parse(response.text);
-    }
-    catch ( exception ) {
-      // IGNORE EXCEPTION
-    }
-    const error = webApiHandleError( null, response, responseBody );
-    if ( error ) {
-      reject(error);
-      return;
-    }
-    resolve(responseBody);
-  });
+function webApiHandleResponse( response ) {
+  let responseBody = null;
+  try {
+    responseBody = JSON.parse(response.text);
+  }
+  catch ( exception ) {
+    // IGNORE EXCEPTION
+  }
+  const error = webApiHandleError( null, response, responseBody );
+  if ( error ) {
+    return Promise.reject(error);
+  }
+  return Promise.resolve(responseBody);
 }
 
-function webApiParseResponse( requestPromise ) {
-  requestPromise
-    .then(
-      webApiParseBody,
-      (networkError) => {
-        return Promise.reject( webApiHandleError(networkError, null, null) );
-      }
-    );
+function webApiHandleNetworkError( networkError ) {
+  return Promise.reject(webApiHandleError(networkError, null, null));
 }
 
 export function createWebApiRequest({
@@ -176,6 +166,7 @@ export function createWebApiRequest({
   return createRequest({
     req,
     basePath,
-    extendPromise: webApiParseResponse,
+    extendPromiseResolve: webApiHandleResponse,
+    extendPromiseReject: webApiHandleNetworkError,
   });
 }
