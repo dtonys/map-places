@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import EventEmitter from 'event-emitter';
 
 import lodashTemplate from 'lodash/template';
 import nodemailer from 'nodemailer';
@@ -77,6 +78,37 @@ export function renderEmail( req, res ) {
   res.send(mjmlOutput.html);
 }
 
+const MAIL_SENT_TIMEOUT = 5000;
+export const MAIL_SENT_EVENT = 'mail:send';
+export const mailEmitter = new EventEmitter();
+
+// Use this if we need access to a list of mail items
+export function collectMail() {
+  const mailArray = [];
+  function handler(mailHtml) {
+    mailArray.push(mailHtml);
+  }
+  mailEmitter.on(MAIL_SENT_EVENT, handler);
+  return () => (mailArray);
+}
+
+// Creates one-off promise that waits for the next incoming mail request
+// Returns html of the mail.
+// Useful for tests to wait for the next mail.
+export function onNextMailSent() {
+  return new Promise((resolve, reject) => {
+    function handler(mailHtml) {
+      resolve(mailHtml);
+      mailEmitter.off(MAIL_SENT_EVENT, handler);
+    }
+    mailEmitter.on(MAIL_SENT_EVENT, handler);
+    // Timeout incase emails is not sent
+    setTimeout(() => {
+      reject();
+    }, MAIL_SENT_TIMEOUT);
+  });
+}
+
 function sendMail({
   from = '"MapPlaces" <mapplacesemail@gmail.com>',
   toEmailArray,
@@ -90,6 +122,7 @@ function sendMail({
       subject,
       html,
     };
+    // lastSentMailHtml = html;
     gmailTransport.sendMail( mailOptions, ( err, info ) => {
       if ( err ) {
         console.log(err); // eslint-disable-line no-console
@@ -97,6 +130,7 @@ function sendMail({
         return;
       }
       console.log('Message sent: ' + info.response ); // eslint-disable-line no-console
+      mailEmitter.emit(MAIL_SENT_EVENT, html);
       resolve();
     });
   });

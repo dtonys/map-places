@@ -7,7 +7,13 @@ import {
   setupTestEnvironment,
   teardownTestEnvironment,
 } from 'helpers/testUtils';
-
+import {
+  onNextMailSent,
+  collectMail,
+} from 'email/mailer';
+import {
+  isValidSession,
+} from 'helpers/session'
 
 describe('Auth API tests', () => {
 
@@ -27,6 +33,16 @@ describe('Auth API tests', () => {
     done();
   });
 
+  // Drop users collection after each test
+  afterEach(async (done) => {
+    try {
+      await User.collection.drop();
+    }
+    catch ( error ) {
+      // IGNORE_EXCEPTION
+    }
+    done();
+  });
   describe('POST `/api/signup`', () => {
     test('Creates a new user, sends a verify email, and logs the user in', async ( done ) => {
       const userPayload = {
@@ -36,6 +52,7 @@ describe('Auth API tests', () => {
         "last_name": "test3_last"
       };
 
+      const nextMailPromise = onNextMailSent();
       const response = await request(
         'POST', '/api/signup', {
           body: userPayload,
@@ -47,30 +64,121 @@ describe('Auth API tests', () => {
       expect(response.body.data.password_hash).toBeTruthy();
       expect(response.body.data.is_email_verified).toBe(false);
 
-      // Sends a verify email
-      // maildev.on('new', function(email){
-      //   console.log('Received new email with subject: %s', email.subject);
-      // });
+      // Verify the email was sent
+      const nextMailHtml = await nextMailPromise;
+      // Email contains verify text
+      expect(nextMailHtml).toContain('Verify your account');
+      // Email contains a link with a session token
+      const result = /verify-email\?sessionToken=(.+")/.exec(nextMailHtml);
+      expect(nextMailHtml).toContain(result[0]);
+      const sessionToken = result[1];
+      expect(sessionToken).toBeTruthy();
+      // The session token is valid
+      const validSesssion = await isValidSession(sessionToken);
+      expect(validSesssion).toBe(true);
 
-      // Logs the user in
-      // Check cookie header to see if cookie is set
-
-      expect(true).toBe(true);
+      // Check user is logged in
+      expect(response.headers['set-cookie'][0]).toContain('MP-Session=');
       done();
     });
 
-    test('', async (done) => {
+    test('Returns 422 error if email already exists', async ( done ) => {
+      const userPayload = {
+        "email": "test3@test.com",
+        "password": "test3_pass",
+        "first_name": "test3_first",
+        "last_name": "test3_last"
+      };
+      await request(
+        'POST', '/api/signup', {
+          body: userPayload,
+        }
+      );
+      const response = await request(
+        'POST', '/api/signup', {
+          body: userPayload,
+        }
+      );
+      expect(response.statusCode).toBe(422);
+      done();
+    });
+  });
+
+  describe('POST `/api/login`', () => {
+    test('Logs the user in', async ( done ) => {
+      const userPayload = {
+        "email": "test3@test.com",
+        "password": "test3_pass",
+        "first_name": "test3_first",
+        "last_name": "test3_last"
+      };
+      await request(
+        'POST', '/api/signup', {
+          body: userPayload,
+        }
+      );
+      const response = await request(
+        'POST', '/api/login', {
+          body: {
+            email: userPayload.email,
+            password: userPayload.password,
+          },
+        }
+      );
+      // API success
+      expect(response.statusCode).toBe(200);
+      // User is logged in
+      expect(response.headers['set-cookie'][0]).toContain('MP-Session=');
       done();
     });
 
+    test('Returns 404 if the user is not found', async ( done ) => {
+      const userPayload = {
+        "email": "test3@test.com",
+        "password": "test3_pass",
+        "first_name": "test3_first",
+        "last_name": "test3_last"
+      };
+      const response = await request(
+        'POST', '/api/login', {
+          body: {
+            email: userPayload.email,
+            password: userPayload.password,
+          },
+        }
+      );
+      // 404
+      expect(response.statusCode).toBe(404);
+      done();
+    });
+
+    test('Returns 422 if the password is wrong', async ( done ) => {
+      const userPayload = {
+        "email": "test3@test.com",
+        "password": "test3_pass",
+        "first_name": "test3_first",
+        "last_name": "test3_last"
+      };
+      await request(
+        'POST', '/api/signup', {
+          body: userPayload,
+        }
+      );
+      const response = await request(
+        'POST', '/api/login', {
+          body: {
+            email: userPayload.email,
+            password: '12345678',
+          },
+        }
+      );
+      // 404
+      expect(response.statusCode).toBe(422);
+      done();
+    });
   });
 
 
-
-  test('POST `/api/login` logs the user in', async ( done ) => {
-    expect(true).toBe(true);
-    done();
-  });
   test('GET `/api/logout` logs the user out', async ( done ) => {
     expect(true).toBe(true);
     done();

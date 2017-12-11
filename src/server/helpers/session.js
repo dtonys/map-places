@@ -30,6 +30,11 @@ export async function getCurrentSessionAndUser( sessionId ) {
   };
 }
 
+export async function isValidSession( sessionId ) {
+  const session = await Session.find({ _id: sessionId });
+  return Boolean(session);
+}
+
 export async function deleteSession( sessionId ) {
   await Session.remove({ _id: sessionId });
 }
