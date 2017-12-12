@@ -95,6 +95,7 @@ export function createRequest({
   basePath,
   extendPromiseResolve = ((val) => Promise.resolve(val)),
   extendPromiseReject = ((err) => Promise.reject(err)),
+  noFollowRedirects = false,
 }) {
   // get base path
   let requestPathBase = '';
@@ -125,6 +126,12 @@ export function createRequest({
       }
       if ( params.body ) {
         request.send(params.body);
+      }
+      if ( params.headers ) {
+        request.set(params.headers);
+      }
+      if ( noFollowRedirects ) {
+        request.redirects(0);
       }
       request.end(( networkError, response ) => {
         if ( networkError ) {

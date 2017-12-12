@@ -32,6 +32,7 @@ export async function setupTestEnvironment(port) {
   // const webApiRequest = createMockWebApiRequest(port);
   const request = createRequest({
     basePath: `http://localhost:${port}`,
+    noFollowRedirects: true,
   });
   portToObject[port] = {
     server,

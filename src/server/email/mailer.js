@@ -116,13 +116,21 @@ function sendMail({
   html,
 }) {
   return new Promise((resolve, reject) => {
+    // HACK: Stub mailer in test env
+    if ( __TEST__ ) {
+      setTimeout(() => {
+        mailEmitter.emit(MAIL_SENT_EVENT, html);
+        resolve();
+      }, 1);
+      return;
+    }
+
     const mailOptions = {
       from, // sender address
       to: toEmailArray.join(', '), // list of receivers
       subject,
       html,
     };
-    // lastSentMailHtml = html;
     gmailTransport.sendMail( mailOptions, ( err, info ) => {
       if ( err ) {
         console.log(err); // eslint-disable-line no-console

@@ -31,7 +31,7 @@ export async function getCurrentSessionAndUser( sessionId ) {
 }
 
 export async function isValidSession( sessionId ) {
-  const session = await Session.find({ _id: sessionId });
+  const session = await Session.findOne({ _id: sessionId });
   return Boolean(session);
 }
 
