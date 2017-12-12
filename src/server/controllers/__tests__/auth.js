@@ -272,14 +272,83 @@ describe('Auth API tests', () => {
     done();
   });
 
-  // test('POST `/api/lost-password` sends an email to reset the user\'s password', async ( done ) => {
-  //   expect(true).toBe(true);
-  //   // TODO
-  //   done();
-  // });
-  // test('POST  `/api/reset-password` changes the user\'s password', async ( done ) => {
-  //   expect(true).toBe(true);
-  //   // TODO
-  //   done();
-  // });
+  test('POST `/api/lost-password` sends an email to reset the user\'s password', async ( done ) => {
+    const userPayload = {
+      "email": "test8@test.com",
+      "password": "test8_pass",
+      "first_name": "test8_first",
+      "last_name": "test8_last",
+    };
+    const getMail = collectMail();
+    await request(
+      'POST', '/api/signup', {
+        body: userPayload,
+      },
+    );
+    const nextMailHtml = await onNextMailSent();
+    await request(
+      'POST', `/api/lost-password`, {
+        body: {
+          email: userPayload.email,
+        },
+      },
+    );
+    const mailList = getMail();
+    const lastMail = mailList[mailList.length - 1];
+    const [emailLink] = /reset-password\?sessionToken=([^"]+)/.exec(lastMail);
+    expect(lastMail).toContain(emailLink);
+    expect(lastMail).toContain('reset your password');
+    expect(lastMail).toContain(userPayload.first_name);
+    done();
+  });
+
+  test('POST  `/api/reset-password` changes the user\'s password', async ( done ) => {
+    const userPayload = {
+      "email": "test8@test.com",
+      "password": "test8_pass",
+      "first_name": "test8_first",
+      "last_name": "test8_last",
+    };
+    const newPassword = 'new_pass';
+    const getMail = collectMail();
+    await request(
+      'POST', '/api/signup', {
+        body: userPayload,
+      },
+    );
+    const nextMailHtml = await onNextMailSent();
+    await request(
+      'POST', `/api/lost-password`, {
+        body: {
+          email: userPayload.email,
+        },
+      },
+    );
+    const mailList = getMail();
+    const lastMail = mailList[mailList.length - 1];
+    const [emailLink, emailToken] = /reset-password\?sessionToken=([^"]+)/.exec(lastMail);
+
+    const resetPasswordResponse = await request(
+      'POST', `/api/reset-password`, {
+        body: {
+          password: newPassword,
+          passwordConfirm: newPassword,
+          sessionToken: emailToken,
+        },
+      },
+    );
+    expect(resetPasswordResponse.statusCode).toBe(200);
+
+    // User can log in with the new password
+    const loginResponse = await request(
+      'POST', '/api/login', {
+        body: {
+          email: userPayload.email,
+          password: newPassword,
+        },
+      }
+    );
+    expect(loginResponse.statusCode).toBe(200);
+    done();
+  });
 });
