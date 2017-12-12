@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+
 import cookie from 'cookie';
 import getPort from 'get-port';
 import User from 'models/user';

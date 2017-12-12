@@ -1,6 +1,5 @@
 import superagent from 'superagent';
 import lodashGet from 'lodash/get';
-import { TEST_PORT } from 'constants';
 export const UNKNOWN_ERROR = 'UNKNOWN_ERROR';
 export const NETWORK_ERROR = 'NETWORK_ERROR';
 export const RESPONSE_BODY_PARSE_FAIL_ERROR = 'RESPONSE_BODY_PARSE_FAIL';
