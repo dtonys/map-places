@@ -70,12 +70,12 @@ describe('Auth API tests', () => {
       // Email contains verify text
       expect(nextMailHtml).toContain('Verify your account');
       // Email contains a link with a session token
-      const [ emailLink, sessionToken ] = /verify-email\?sessionToken=(.+")/.exec(nextMailHtml);
+      const [ emailLink, sessionToken ] = /verify-email\?sessionToken=([^"]+)/.exec(nextMailHtml);
       expect(nextMailHtml).toContain(emailLink);
       expect(sessionToken).toBeTruthy();
       // The session token is valid
-      // const validSession = await isValidSession(decodeURIComponent(sessionToken));
-      // expect(validSession).toBe(true);
+      const validSession = await isValidSession(decodeURIComponent(sessionToken));
+      expect(validSession).toBe(true);
 
       // Check user is logged in
       expect(response.headers['set-cookie'][0]).toContain('MP-Session=');
