@@ -3,8 +3,8 @@
  */
 
 
-describe('User API tests', () => {
-  test('A window and document object should exist', () => {
+describe('nodejs environment tests', () => {
+  test('A global and process object should exist', () => {
     expect(global).toBeTruthy();
     expect(process).toBeTruthy();
   });
