@@ -135,6 +135,7 @@ export function createRequest({
       request.end(( networkError, response ) => {
         if ( networkError ) {
           reject(networkError);
+          return;
         }
         resolve(response);
       });

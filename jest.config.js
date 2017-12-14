@@ -20,7 +20,11 @@ module.exports = {
   //   'module_name_(.*)': '<rootDir>/substituted_module_$1.js',
   // },
   rootDir: './src',
+  roots: [
+    '<rootDir>',
+    '<rootDir>/../pages',
+  ],
   testEnvironment: 'node',
-  testPathIgnorePatterns: [ '<rootDir>/.next/', '<rootDir>/node_modules/' ],
+  testPathIgnorePatterns: [ '<rootDir>/../.next/', '<rootDir>/../node_modules/' ],
   setupTestFrameworkScriptFile: '<rootDir>/setupTests.js',
 };
