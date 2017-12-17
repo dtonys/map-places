@@ -19,6 +19,36 @@ import {
 
 import { createWebApiRequest } from 'web-api/webApiRequest';
 
+export async function loadUserData(store) {
+  store.dispatch( makeAction(
+    execute(ACTION_INCREMENT_COUNTER)
+  ) );
+  // Load user on every page
+  await store.dispatch( makeAction(
+    request( ACTION_LOAD_USER ),
+    null,
+    { deferred: true }
+  ) );
+}
+
+export function createStoreWithSaga({ req, initialState } = {}) {
+  const { store, sagaMiddleware } = createStore(initialState);
+  const webApiRequest = createWebApiRequest({ req });
+  const rootTask = sagaMiddleware.run(rootSaga, webApiRequest);
+  return {
+    store,
+    rootTask,
+  };
+}
+
+export async function endSagaAndGetInitialState( store, rootTask ) {
+  // Dispatch END, prevents new actions from coming in.  Existing actions will finish.
+  store.dispatch(REDUX_SAGA_END);
+  // Wait for remaining actions to finish.
+  await rootTask.done;
+  // Return current state
+  return store.getState();
+}
 
 let clientStore = null;
 let serverStore = null;
@@ -44,21 +74,13 @@ function AttachReduxWithArgs(/* args */) {
 
         if ( __SERVER__ ) {
           const { req } = context;
-
-          const { store, sagaMiddleware } = createStore();
-          serverStore = store;
-          const webApiRequest = createWebApiRequest({ req });
-          rootTask = sagaMiddleware.run(rootSaga, webApiRequest);
-          serverStore.dispatch( makeAction(
-            execute(ACTION_INCREMENT_COUNTER)
-          ) );
-          // Load user on every page
-          await serverStore.dispatch( makeAction(
-            request( ACTION_LOAD_USER ),
-            null,
-            { deferred: true }
-          ) );
-          // Pass the store so the child component so it can access state and dispatch
+          const storeData = createStoreWithSaga({ req });
+          // Load initial user data
+          await loadUserData( storeData.store );
+          // Set local variables
+          serverStore = storeData.store;
+          rootTask = storeData.rootTask;
+          // Pass the store to the child component so it can access state and dispatch
           context.store = serverStore;
         }
 
@@ -69,12 +91,7 @@ function AttachReduxWithArgs(/* args */) {
         }
 
         if ( __SERVER__ ) {
-          // Dispatch END, prevents new actions from coming in.  Existing actions will finish.
-          serverStore.dispatch(REDUX_SAGA_END);
-          // Wait for remaining actions to finish.
-          await rootTask.done;
-          // Make initial state be available to the client as a prop
-          serverStoreInitialState = serverStore.getState();
+          serverStoreInitialState = await endSagaAndGetInitialState( serverStore, rootTask );
           return {
             ...wrappedComponentInitialProps,
             serverStoreInitialState,
@@ -87,10 +104,10 @@ function AttachReduxWithArgs(/* args */) {
         super(props);
         if ( __CLIENT__ ) {
           if ( !clientStore ) {
-            const { store, sagaMiddleware } = createStore( props.serverStoreInitialState );
-            clientStore = store;
-            const webApiRequest = createWebApiRequest();
-            sagaMiddleware.run(rootSaga, webApiRequest);
+            const storeData = createStoreWithSaga({
+              initialState: props.serverStoreInitialState,
+            });
+            clientStore = storeData.store;
             window.store = clientStore;
           }
         }

@@ -28,6 +28,9 @@ module.exports = {
     './server',
     './common',
   ],
+  setupFiles: [
+    '<rootDir>/setupFiles.js',
+  ],
   setupTestFrameworkScriptFile: '<rootDir>/setupTests.js',
   snapshotSerializers: [
     'enzyme-to-json/serializer',
