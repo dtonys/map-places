@@ -10,7 +10,7 @@ import sagaPromiseMiddleware from 'redux-modules/middleware/sagaPromiseMiddlewar
 function createStore( initialState = {} ) {
   const middleware = [];
 
-  if ( __DEVELOPMENT__ ) {
+  if ( __DEVELOPMENT__ && !__TEST__ ) {
 
     const loggerIgnoredActionTypes = [
       'OMIT_THIS_ACTION',

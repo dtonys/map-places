@@ -15,7 +15,7 @@ import {
 } from 'email/mailer';
 import {
   isValidSession,
-} from 'helpers/session'
+} from 'helpers/session';
 
 describe('Auth API tests', () => {
 
@@ -48,10 +48,10 @@ describe('Auth API tests', () => {
   describe('POST `/api/signup`', () => {
     test('Creates a new user, sends a verify email, and logs the user in', async ( done ) => {
       const userPayload = {
-        "email": "test1@test.com",
-        "password": "test1_pass",
-        "first_name": "test1_first",
-        "last_name": "test1_last",
+        email: 'test1@test.com',
+        password: 'test1_pass',
+        first_name: 'test1_first',
+        last_name: 'test1_last',
       };
 
       const nextMailPromise = onNextMailSent();
@@ -85,10 +85,10 @@ describe('Auth API tests', () => {
 
     test('Returns 422 error if email already exists', async ( done ) => {
       const userPayload = {
-        "email": "test2@test.com",
-        "password": "test2_pass",
-        "first_name": "test2_first",
-        "last_name": "test2_last",
+        email: 'test2@test.com',
+        password: 'test2_pass',
+        first_name: 'test2_first',
+        last_name: 'test2_last',
       };
       await request(
         'POST', '/api/signup', {
@@ -108,10 +108,10 @@ describe('Auth API tests', () => {
   describe('POST `/api/login`', () => {
     test('Logs the user in', async ( done ) => {
       const userPayload = {
-        "email": "test3@test.com",
-        "password": "test3_pass",
-        "first_name": "test3_first",
-        "last_name": "test3_last",
+        email: 'test3@test.com',
+        password: 'test3_pass',
+        first_name: 'test3_first',
+        last_name: 'test3_last',
       };
       await request(
         'POST', '/api/signup', {
@@ -135,10 +135,10 @@ describe('Auth API tests', () => {
 
     test('Returns 404 if the user is not found', async ( done ) => {
       const userPayload = {
-        "email": "test4@test.com",
-        "password": "test4_pass",
-        "first_name": "test4_first",
-        "last_name": "test4_last",
+        email: 'test4@test.com',
+        password: 'test4_pass',
+        first_name: 'test4_first',
+        last_name: 'test4_last',
       };
       const response = await request(
         'POST', '/api/login', {
@@ -155,10 +155,10 @@ describe('Auth API tests', () => {
 
     test('Returns 422 if the password is wrong', async ( done ) => {
       const userPayload = {
-        "email": "test5@test.com",
-        "password": "test5_pass",
-        "first_name": "test5_first",
-        "last_name": "test5_last",
+        email: 'test5@test.com',
+        password: 'test5_pass',
+        first_name: 'test5_first',
+        last_name: 'test5_last',
       };
       await request(
         'POST', '/api/signup', {
@@ -182,22 +182,22 @@ describe('Auth API tests', () => {
 
   test('GET `/api/logout` logs the user out', async ( done ) => {
     const userPayload = {
-      "email": "test6@test.com",
-      "password": "test6_pass",
-      "first_name": "test6_first",
-      "last_name": "test6_last",
+      email: 'test6@test.com',
+      password: 'test6_pass',
+      first_name: 'test6_first',
+      last_name: 'test6_last',
     };
     const signupResponse = await request(
       'POST', '/api/signup', {
         body: userPayload,
       }
     );
-    const [, sessionToken] = /MP-Session=([^;]+)/.exec(signupResponse.headers['set-cookie'][0]);
+    const [ , sessionToken ] = /MP-Session=([^;]+)/.exec(signupResponse.headers['set-cookie'][0]);
     expect(true).toBe(true);
     const response = await request(
-      'GET', `/api/logout`, {
+      'GET', '/api/logout', {
         headers: {
-          'Cookie': `MP-Session=${sessionToken}`,
+          Cookie: `MP-Session=${sessionToken}`,
         },
       },
     );
@@ -212,21 +212,21 @@ describe('Auth API tests', () => {
 
   test('GET `/api/session/info` gets the logged in user\'s data', async ( done ) => {
     const userPayload = {
-      "email": "test7@test.com",
-      "password": "test7_pass",
-      "first_name": "test7_first",
-      "last_name": "test7_last",
+      email: 'test7@test.com',
+      password: 'test7_pass',
+      first_name: 'test7_first',
+      last_name: 'test7_last',
     };
     const signupResponse = await request(
       'POST', '/api/signup', {
         body: userPayload,
       }
     );
-    const [, sessionToken] = /MP-Session=([^;]+)/.exec(signupResponse.headers['set-cookie'][0]);
+    const [ , sessionToken ] = /MP-Session=([^;]+)/.exec(signupResponse.headers['set-cookie'][0]);
     const response = await request(
-      'GET', `/api/session/info`, {
+      'GET', '/api/session/info', {
         headers: {
-          'Cookie': `MP-Session=${sessionToken}`,
+          Cookie: `MP-Session=${sessionToken}`,
         },
       },
     );
@@ -238,10 +238,10 @@ describe('Auth API tests', () => {
 
   test('GET `/api/verify-email` makes the user verified and redirects to home', async ( done ) => {
     const userPayload = {
-      "email": "test8@test.com",
-      "password": "test8_pass",
-      "first_name": "test8_first",
-      "last_name": "test8_last",
+      email: 'test8@test.com',
+      password: 'test8_pass',
+      first_name: 'test8_first',
+      last_name: 'test8_last',
     };
     const nextMailPromise = onNextMailSent();
     const signupResponse = await request(
@@ -249,13 +249,13 @@ describe('Auth API tests', () => {
         body: userPayload,
       },
     );
-    const [, sessionToken] = /MP-Session=([^;]+)/.exec(signupResponse.headers['set-cookie'][0]);
+    const [ , sessionToken ] = /MP-Session=([^;]+)/.exec(signupResponse.headers['set-cookie'][0]);
     const nextMailHtml = await nextMailPromise;
-    const [, emailToken] = /\/api\/verify-email\?sessionToken=([^"]+)/.exec(nextMailHtml);
+    const [ , emailToken ] = /\/api\/verify-email\?sessionToken=([^"]+)/.exec(nextMailHtml);
     const validSessionToken = await isValidSession(decodeURIComponent(sessionToken));
     expect(validSessionToken).toBe(true);
     const verifyResponse = await request(
-      'GET', `/api/verify-email`, {
+      'GET', '/api/verify-email', {
         query: {
           sessionToken: emailToken,
         },
@@ -275,10 +275,10 @@ describe('Auth API tests', () => {
 
   test('POST `/api/lost-password` sends an email to reset the user\'s password', async ( done ) => {
     const userPayload = {
-      "email": "test8@test.com",
-      "password": "test8_pass",
-      "first_name": "test8_first",
-      "last_name": "test8_last",
+      email: 'test8@test.com',
+      password: 'test8_pass',
+      first_name: 'test8_first',
+      last_name: 'test8_last',
     };
     const getMail = collectMail();
     await request(
@@ -286,9 +286,8 @@ describe('Auth API tests', () => {
         body: userPayload,
       },
     );
-    const nextMailHtml = await onNextMailSent();
     await request(
-      'POST', `/api/lost-password`, {
+      'POST', '/api/lost-password', {
         body: {
           email: userPayload.email,
         },
@@ -296,7 +295,7 @@ describe('Auth API tests', () => {
     );
     const mailList = getMail();
     const lastMail = mailList[mailList.length - 1];
-    const [emailLink] = /reset-password\?sessionToken=([^"]+)/.exec(lastMail);
+    const [ emailLink ] = /reset-password\?sessionToken=([^"]+)/.exec(lastMail);
     expect(lastMail).toContain(emailLink);
     expect(lastMail).toContain('reset your password');
     expect(lastMail).toContain(userPayload.first_name);
@@ -305,10 +304,10 @@ describe('Auth API tests', () => {
 
   test('POST  `/api/reset-password` changes the user\'s password', async ( done ) => {
     const userPayload = {
-      "email": "test8@test.com",
-      "password": "test8_pass",
-      "first_name": "test8_first",
-      "last_name": "test8_last",
+      email: 'test8@test.com',
+      password: 'test8_pass',
+      first_name: 'test8_first',
+      last_name: 'test8_last',
     };
     const newPassword = 'new_pass';
     const getMail = collectMail();
@@ -317,9 +316,8 @@ describe('Auth API tests', () => {
         body: userPayload,
       },
     );
-    const nextMailHtml = await onNextMailSent();
     await request(
-      'POST', `/api/lost-password`, {
+      'POST', '/api/lost-password', {
         body: {
           email: userPayload.email,
         },
@@ -327,10 +325,10 @@ describe('Auth API tests', () => {
     );
     const mailList = getMail();
     const lastMail = mailList[mailList.length - 1];
-    const [emailLink, emailToken] = /reset-password\?sessionToken=([^"]+)/.exec(lastMail);
+    const [ /* emailLink */, emailToken ] = /reset-password\?sessionToken=([^"]+)/.exec(lastMail);
 
     const resetPasswordResponse = await request(
-      'POST', `/api/reset-password`, {
+      'POST', '/api/reset-password', {
         body: {
           password: newPassword,
           passwordConfirm: newPassword,
