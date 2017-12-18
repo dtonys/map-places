@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Login page Should mount with enzyme 1`] = `
+exports[`Login page Should mount and render successfully 1`] = `
 <ClientEntryHOC(AttachReduxHOC(Connect(LoginPage)))
   url={
     Object {
@@ -720,6 +720,7 @@ exports[`Login page Should mount with enzyme 1`] = `
                                               </label>
                                               <input
                                                 className=""
+                                                data-test="email"
                                                 name="email"
                                                 onBlur={[Function]}
                                                 onChange={[Function]}
@@ -1046,6 +1047,7 @@ exports[`Login page Should mount with enzyme 1`] = `
                                               </label>
                                               <input
                                                 className=""
+                                                data-test="password"
                                                 name="password"
                                                 onBlur={[Function]}
                                                 onChange={[Function]}
@@ -1065,6 +1067,7 @@ exports[`Login page Should mount with enzyme 1`] = `
                                     >
                                       <button
                                         className="jsx-3124548032 col col-6"
+                                        data-test="submit"
                                       >
                                         Submit
                                       </button>

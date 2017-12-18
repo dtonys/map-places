@@ -29,7 +29,11 @@ const LoginFormView = ({
         <h3> Login </h3>
         <fieldset>
           { serverErrorMessage &&
-            <div className="error" style={{ marginBottom: '10px' }} >
+            <div
+              className="error"
+              style={{ marginBottom: '10px' }}
+              data-test="serverError"
+            >
               {serverErrorMessage}
             </div>
           }
@@ -48,7 +52,10 @@ const LoginFormView = ({
             requiredStar
           />
           <div className="form-item row">
-            <button className="col col-6" >Submit</button>
+            <button
+              className="col col-6"
+              data-test="submit"
+            >Submit</button>
             <div className="col col-6 forgotPassword">
               <Link route="/lost-password">
                 <a className="forgotPasswordLink" >Forgot your password?</a>

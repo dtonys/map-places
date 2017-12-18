@@ -106,7 +106,6 @@ export function createRequest({
   }
   // return requester function
   return function apiRequest( method, path, params = {} ) {
-
     return new Promise((resolve, reject) => {
       const requestPath = requestPathBase + path;
       const request = superagent( method, requestPath );
@@ -114,7 +113,6 @@ export function createRequest({
       // - `networkError` will only be populated if `resonse.text` is falsey
       // - Only one of `networkError` or `response` will be set in the callback, never both.
       request.ok((response) => Boolean(response && response.text) );
-
       // For server side requests, pass the cookie from the express `req`
       // to our current request's headers
       if ( req && lodashGet(req, 'headers.cookie') ) {
@@ -155,6 +153,7 @@ function webApiHandleResponse( response ) {
   catch ( exception ) {
     // IGNORE EXCEPTION
   }
+
   const error = webApiHandleError( null, response, responseBody );
   if ( error ) {
     return Promise.reject(error);

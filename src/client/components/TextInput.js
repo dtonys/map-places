@@ -33,6 +33,7 @@ const TextInput = ({
         {...input}
         type={type}
         className={inputClass}
+        data-test={input.name}
       />
       { showErrorMessage && <div className="error smaller">{meta.error[0]}</div> }
       { /* showError &&
