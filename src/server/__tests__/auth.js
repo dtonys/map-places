@@ -4,7 +4,7 @@ import User from 'models/user';
 import {
   setupTestEnvironment,
   teardownTestEnvironment,
-} from 'helpers/testUtils';
+} from './helpers/utils';
 import {
   onNextMailSent,
   collectMail,

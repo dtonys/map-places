@@ -4,7 +4,7 @@ import faker from 'faker';
 import {
   setupTestEnvironment,
   teardownTestEnvironment,
-} from 'helpers/testUtils';
+} from './helpers/utils';
 
 function generateFakeUsers( num ) {
   const fakeUsers = [];

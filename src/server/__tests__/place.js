@@ -3,7 +3,7 @@ import Place from 'models/place';
 import {
   setupTestEnvironment,
   teardownTestEnvironment,
-} from 'helpers/testUtils';
+} from './helpers/utils';
 
 describe('Place API tests', () => {
 

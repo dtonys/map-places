@@ -5,8 +5,6 @@
  * Solution: Re-use one JSDOM instance, and exclude babel-polyfill.
  * https://github.com/facebook/jest/issues/1893#issuecomment-275080618
  */
-
-console.log('setup client tests');
 import 'raf/polyfill';
 import 'jest-enzyme';
 import Enzyme from 'enzyme';
