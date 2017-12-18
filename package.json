@@ -15,8 +15,11 @@
     "start-admin": "cross-env NODE_ENV=production forever start --uid map-places-admin --append -c 'serve -s -p 8060' ./admin/build",
     "lint-js": "eslint -c ./.eslintrc.js ./bin ./pages ./src",
     "analyze": "cross-env ANALYZE=1 next build",
-    "test": "jest --config ./jest.config.js  --coverage",
-    "test:watch": "jest --config ./jest.config.js --watch",
+    "test": "npm-run-all test-client test-server",
+    "test-client": "jest --config ./jest.client.config.js --coverage",
+    "test-server": "jest --config ./jest.server.config.js --coverage",
+    "test-client:watch": "jest --config ./jest.client.config.js --watch",
+    "test-server:watch": "jest --config ./jest.server.config.js --watch",
     "console": "cross-env DEBUG=mp* babel-node ./bin/run-console.js"
   },
   "dependencies": {
