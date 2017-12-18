@@ -1,7 +1,3 @@
-/**
- * @jest-environment node
- */
-
 import getPort from 'get-port';
 import Place from 'models/place';
 import {

@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { mount } from 'enzyme';
 import LoginPage from '../login';
 import {
@@ -49,9 +46,6 @@ describe('Login page', () => {
     expect(true).toBeTruthy();
   });
 
-  test('Should display a login form and a navbar', () => {
-    expect(true).toBeTruthy();
-  });
   // On login submit error, should see a server error in the login form
   // On login submit success, should redirect to home page
 });

@@ -1,6 +1,3 @@
-/**
- * @jest-environment node
- */
 import getPort from 'get-port';
 import User from 'models/user';
 import faker from 'faker';
@@ -188,6 +185,5 @@ describe('Admin on rest API, via simpleRestClient specifications', () => {
     expect(deletedUser).toEqual(allUsers[0]);
     done();
   });
-
 
 });
