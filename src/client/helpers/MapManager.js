@@ -63,17 +63,17 @@ export const ACTIVE_ICON_PATH = '/static/pin_w30_active.svg';
 export const GREYED_ICON_PATH = '/static/pin_w30_greyed.svg';
 
 const MapManager = {
-  /** Private members **/
+  /* Private members */
   _mapDomNode: null,
 
-  /** Public members **/
+  /* Public members */
   initializeComplete: null,
   googleMap: null,
   googleMapMarkers: {},
   onMapClickListeners: [],
   onMarkerClickListeners: [],
 
-  /** Private methods **/
+  /* Private methods */
   _createMapDomNode: function () { // eslint-disable-line func-names
     if ( this._mapDomNode ) return;
     this._mapDomNode = document.createElement('div');
@@ -119,7 +119,7 @@ const MapManager = {
     window.googleMap = this.googleMap;
   },
 
-  /** Public methods **/
+  /* Public methods */
   initialize: function ({ initialCenterLatLng }) { // eslint-disable-line func-names
     this._createMapDomNode();
     this.initializeComplete = this._loadGoogleMapsScript()
