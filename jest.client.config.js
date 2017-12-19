@@ -4,6 +4,7 @@ module.exports = {
   roots: [
     '<rootDir>',
     '<rootDir>/../../pages',
+    '<rootDir>/../common',
   ],
   testPathIgnorePatterns: [
     '<rootDir>/../../.next/',
