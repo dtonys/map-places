@@ -71,7 +71,10 @@ class LostPasswordPage extends Component {
               />
             }
             { apiSuccess &&
-              <div className="successWrap">
+              <div
+                data-test="successWrap"
+                className="successWrap"
+              >
                 <div className="messageWrap">
                   <div>{'Request submitted.'}</div>
                   <br />

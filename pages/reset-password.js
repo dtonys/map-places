@@ -39,7 +39,10 @@ class ResetPasswordPage extends Component {
   }
 
   submitForm = ( payload ) => {
-    const sessionToken = window.location.search.split('sessionToken=')[1].split('&')[0];
+    const sessionToken = ( window.location.search
+      ? window.location.search.split('sessionToken=')[1].split('&')[0]
+      : ''
+    );
     const payloadWithToken = {
       ...payload,
       sessionToken,
@@ -49,11 +52,15 @@ class ResetPasswordPage extends Component {
       payloadWithToken,
       { deferred: true },
     ) );
-    resetPasswordPromise.then(() => {
-      this.setState({
-        apiSuccess: true,
+    resetPasswordPromise
+      .then(() => {
+        this.setState({
+          apiSuccess: true,
+        });
+      })
+      .catch(() => {
       });
-    });
+
   }
 
   render() {
@@ -74,9 +81,12 @@ class ResetPasswordPage extends Component {
               />
             }
             { apiSuccess &&
-              <div className="successWrap">
+              <div
+                className="successWrap"
+                data-test="successWrap"
+              >
                 <div className="messageWrap">
-                  <div>{'You password was changed successfully'}</div>
+                  <div>{'Your password was changed successfully'}</div>
                   <br />
                   <div>
                     {'Go to the '}

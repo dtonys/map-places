@@ -34,7 +34,9 @@ describe('Lost password page', () => {
       .simulate('change', { target: { value: 'abcdefg@gmail.com' } });
     lostPasswordPage.find('[data-test="submit"]').getDOMNode().click();
     setTimeout(() => {
-      expect(lostPasswordPage.find('form')).toIncludeText('Email not found');
+      lostPasswordPage.update();
+      expect(lostPasswordPage.find('[data-test="serverError"]'))
+        .toIncludeText('Email not found');
       done();
     }, 100);
   });
@@ -51,11 +53,11 @@ describe('Lost password page', () => {
       .simulate('change', { target: { value: 'abcdefg@gmail.com' } });
     lostPasswordPage.find('[data-test="submit"]').getDOMNode().click();
     setTimeout(() => {
-      expect(lostPasswordPage.find('form'))
+      lostPasswordPage.update();
+      expect(lostPasswordPage.find('[data-test="successWrap"]'))
         .toIncludeText('Check your email to reset your password.');
       done();
     }, 100);
-    done();
   });
 
 });

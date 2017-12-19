@@ -40,7 +40,8 @@ describe('Login page', () => {
       .simulate('change', { target: { value: '12345678' } });
     loginPage.find('[data-test="submit"]').getDOMNode().click();
     setTimeout(() => {
-      expect(loginPage.find('form')).toIncludeText('Email not found');
+      loginPage.update();
+      expect(loginPage.find('[data-test="serverError"]')).toIncludeText('Email not found');
       done();
     }, 100);
   });
