@@ -44,11 +44,13 @@ class LostPasswordPage extends Component {
       payload,
       { deferred: true },
     ) );
-    lostPasswordPromise.then(() => {
-      this.setState({
-        apiSuccess: true,
-      });
-    });
+    lostPasswordPromise
+      .then(() => {
+        this.setState({
+          apiSuccess: true,
+        });
+      })
+      .catch(() => {});
   }
 
   render() {

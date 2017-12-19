@@ -34,14 +34,14 @@ const ResetPasswordFormView = ({
           <ReduxFormField
             component={TextInput}
             label="Password"
-            type="text"
+            type="password"
             name="password"
             requiredStar
           />
           <ReduxFormField
             component={TextInput}
             label="Password Confirm"
-            type="text"
+            type="password"
             name="passwordConfirm"
             requiredStar
           />

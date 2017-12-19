@@ -1,26 +1,8 @@
 jest.mock('superagent', () => ( require('../../jest-config/__mocks__/superagent') ));
 import { mount } from 'enzyme';
 import LoginPage from '../login';
+import { getMockUrlProp } from './helpers/utils';
 
-
-function getMockUrlProp( pathname ) {
-  switch (pathname) {
-    case 'login': {
-      return {
-        query: {},
-        pathname: '/login',
-        asPath: '/login',
-      };
-    }
-    default: {
-      return {
-        query: {},
-        pathname: '/',
-        asPath: '/',
-      };
-    }
-  }
-}
 
 describe('Login page', () => {
 
@@ -29,27 +11,23 @@ describe('Login page', () => {
   beforeAll((done) => {
     superagent = require('superagent');
     superagent.__setMockDelay(1);
-    loginPage = mount(<LoginPage url={getMockUrlProp('login')} />);
+    loginPage = mount(<LoginPage url={getMockUrlProp('/login')} />);
     done();
   });
 
   test('Should mount and render successfully', () => {
     expect(loginPage).toMatchSnapshot();
-    expect(true).toBeTruthy();
   });
 
   test('Should display navbar and a login form', () => {
     expect(loginPage.find('Navbar').exists()).toBe(true);
     expect(loginPage.find('LoginFormView').exists()).toBe(true);
-    expect(true).toBeTruthy();
   });
 
-  // On login submit error, should see a server error in the login form
   test('On login submit error, should see a server error in the login form', (done) => {
-    const emailNotFoundError = 'Email not found';
     const emailNotFoundPayload = {
       error: [
-        { message: emailNotFoundError },
+        { message: 'Email not found' },
       ],
     };
     superagent.__setMockResponse({
@@ -62,7 +40,7 @@ describe('Login page', () => {
       .simulate('change', { target: { value: '12345678' } });
     loginPage.find('[data-test="submit"]').getDOMNode().click();
     setTimeout(() => {
-      expect(loginPage.find('form')).toIncludeText(emailNotFoundError);
+      expect(loginPage.find('form')).toIncludeText('Email not found');
       done();
     }, 100);
   });

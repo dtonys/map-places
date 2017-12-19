@@ -87,7 +87,12 @@ class ResetPasswordPage extends Component {
                   </div>
                   <br />
                   <Link route="/login">
-                    <a><button className="button w50">Login</button></a>
+                    <a>
+                      <button
+                        className="button w50"
+                        data-test="submit"
+                      >Login</button>
+                    </a>
                   </Link>
                 </div>
               </div>

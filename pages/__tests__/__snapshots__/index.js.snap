@@ -1,0 +1,242 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Home page Should mount and render successfully 1`] = `
+<ClientEntryHOC(AttachReduxHOC(Connect(HomePage)))
+  url={
+    Object {
+      "asPath": "/",
+      "pathname": "/",
+      "query": Object {},
+    }
+  }
+>
+  <AttachReduxHOC(Connect(HomePage))
+    url={
+      Object {
+        "asPath": "/",
+        "pathname": "/",
+        "query": Object {},
+      }
+    }
+  >
+    <Provider
+      store={
+        Object {
+          "dispatch": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+          Symbol(observable): [Function],
+        }
+      }
+    >
+      <Connect(HomePage)
+        url={
+          Object {
+            "asPath": "/",
+            "pathname": "/",
+            "query": Object {},
+          }
+        }
+      >
+        <HomePage
+          dispatch={[Function]}
+          places={Object {}}
+          placesLoadedFromStorage={false}
+          url={
+            Object {
+              "asPath": "/",
+              "pathname": "/",
+              "query": Object {},
+            }
+          }
+        >
+          <div
+            className="jsx-826859815"
+          >
+            <Layout
+              htmlTitle="Home"
+            >
+              <div
+                className="jsx-2650881538"
+              >
+                <SideEffect(Head)>
+                  <Head />
+                </SideEffect(Head)>
+                <Connect(Navbar)>
+                  <Navbar
+                    currentUser={null}
+                    dispatch={[Function]}
+                    userAuthenticated={false}
+                  >
+                    <div
+                      className="jsx-306046629 navbar"
+                    >
+                      <div
+                        className="jsx-306046629 section section-1"
+                      >
+                        <LinkRoutes
+                          route="/"
+                        >
+                          <Link
+                            as="/"
+                            href="/"
+                          >
+                            <a
+                              className="jsx-306046629 logoLink"
+                              href="/"
+                              onClick={[Function]}
+                            >
+                              <div
+                                className="jsx-306046629 logoName"
+                              >
+                                Map Places
+                              </div>
+                            </a>
+                          </Link>
+                        </LinkRoutes>
+                        <div
+                          className="jsx-306046629"
+                          style={
+                            Object {
+                              "marginRight": "10px",
+                            }
+                          }
+                        />
+                        <div
+                          className="jsx-306046629 item"
+                        >
+                          Maps
+                        </div>
+                        <div
+                          className="jsx-306046629"
+                          style={
+                            Object {
+                              "marginRight": "10px",
+                            }
+                          }
+                        />
+                        <div
+                          className="jsx-306046629 item"
+                        >
+                          Other
+                        </div>
+                      </div>
+                      <div
+                        className="jsx-306046629 section section-2"
+                      />
+                      <div
+                        className="jsx-306046629 section section-3"
+                      >
+                        <LinkRoutes
+                          route="/login"
+                        >
+                          <Link
+                            as="/login"
+                            href="/login"
+                          >
+                            <a
+                              className="jsx-306046629"
+                              href="/login"
+                              onClick={[Function]}
+                            >
+                              <button
+                                className="jsx-306046629 button outline"
+                              >
+                                Login
+                              </button>
+                            </a>
+                          </Link>
+                        </LinkRoutes>
+                        <div
+                          className="jsx-306046629"
+                          style={
+                            Object {
+                              "marginRight": "10px",
+                            }
+                          }
+                        />
+                        <LinkRoutes
+                          route="/signup"
+                        >
+                          <Link
+                            as="/signup"
+                            href="/signup"
+                          >
+                            <a
+                              className="jsx-306046629"
+                              href="/signup"
+                              onClick={[Function]}
+                            >
+                              <button
+                                className="jsx-306046629 button outline secondary"
+                              >
+                                Signup
+                              </button>
+                            </a>
+                          </Link>
+                        </LinkRoutes>
+                        <LinkRoutes
+                          route="/users/profile"
+                        >
+                          <Link
+                            as="/users/profile"
+                            href="/users?id=profile"
+                          >
+                            <a
+                              className="jsx-306046629"
+                              href="/users/profile"
+                              onClick={[Function]}
+                            >
+                              <button
+                                className="jsx-306046629 button outline secondary"
+                              >
+                                Profile
+                              </button>
+                            </a>
+                          </Link>
+                        </LinkRoutes>
+                      </div>
+                      <JSXStyle
+                        css=".navbar.jsx-306046629{height:60px;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;padding:0 20px;background:#eee;position:absolute;top:0;left:0;right:0;border-bottom:solid black 2px;}.logoName.jsx-306046629{font-size:20px;color:rgb(49,52,57);cursor:pointer;text-decoration:none;}.logoLink.jsx-306046629{text-decoration:none;}.section-1.jsx-306046629{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;margin-right:20px;white-space:nowrap;}.section-2.jsx-306046629{-webkit-flex:1;-ms-flex:1;flex:1;}.section-3.jsx-306046629{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:end;-webkit-justify-content:flex-end;-ms-flex-pack:end;justify-content:flex-end;margin-left:20px;}.userName.jsx-306046629{margin-top:10px;overflow:hidden;text-overflow:ellipsis;max-width:200px;white-space:nowrap;}.searchWrap.jsx-306046629{margin:0 20px;}"
+                        styleId="306046629"
+                      />
+                    </div>
+                  </Navbar>
+                </Connect(Navbar)>
+                <div
+                  className="jsx-2650881538 scrollWrap"
+                >
+                  <div
+                    className="jsx-2650881538 content"
+                  >
+                    <div
+                      className="jsx-826859815 mapSidebar"
+                    />
+                    <div
+                      className="jsx-826859815 mapContent"
+                    >
+                      <div
+                        className="jsx-826859815 mapRegion"
+                        id="mapRegion"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <JSXStyle
+                  css=".content.jsx-2650881538{max-width:840px;margin:auto;}.scrollWrap.jsx-2650881538{position:absolute;top:60px;left:0;right:0;bottom:0;overflow:auto;}h1.jsx-2650881538{text-align:center;}"
+                  styleId="2650881538"
+                />
+              </div>
+            </Layout>
+            <JSXStyle
+              css=".mapRegionWrap.jsx-826859815{height:100%;position:relative;}#mapRegion.jsx-826859815{height:100%;background:grey;}.legend.jsx-826859815{position:absolute;top:0;right:0;width:100px;border:solid black 2px;background:white;}.centerMap.jsx-826859815{position:absolute;top:10px;left:50%;width:100px;margin-left:-50px;min-height:0px;padding:2px 20px;background:white;color:black;border:solid black 2px;}.mapSidebar.jsx-826859815{position:absolute;border-right:solid black 2px;width:300px;top:0;left:0;bottom:0;overflow:auto;overflow-x:hidden;}.mapContent.jsx-826859815{position:absolute;top:0;left:300px;right:0;bottom:0;}.placeListItem.jsx-826859815{padding:10px;border-bottom:solid black 2px;height:4em;text-overflow:ellipsis;}.placeListItem.jsx-826859815:hover{background:#EEE;cursor:pointer;}"
+              styleId="826859815"
+            />
+          </div>
+        </HomePage>
+      </Connect(HomePage)>
+    </Provider>
+  </AttachReduxHOC(Connect(HomePage))>
+</ClientEntryHOC(AttachReduxHOC(Connect(HomePage)))>
+`;
