@@ -27,7 +27,11 @@ const SignupFormView = ({
         <h3> Signup </h3>
         <fieldset>
           { serverErrorMessage &&
-            <div className="error" style={{ marginBottom: '10px' }} >
+            <div
+              className="error"
+              style={{ marginBottom: '10px' }}
+              data-test="serverError"
+            >
               {serverErrorMessage}
             </div>
           }
@@ -46,7 +50,10 @@ const SignupFormView = ({
             requiredStar
           />
           <div className="form-item">
-            <button className="w50" >Submit</button>
+            <button
+              className="w50"
+              data-test="submit"
+            >Submit</button>
           </div>
         </fieldset>
       </form>

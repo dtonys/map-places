@@ -1067,6 +1067,7 @@ exports[`Signup page Should mount and render successfully 1`] = `
                                     >
                                       <button
                                         className="jsx-1255579971 w50"
+                                        data-test="submit"
                                       >
                                         Submit
                                       </button>
