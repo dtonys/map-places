@@ -1,4 +1,3 @@
-import getPort from 'get-port';
 import User from 'models/user';
 import faker from 'faker';
 import {
@@ -19,18 +18,16 @@ function generateFakeUsers( num ) {
 
 describe('Admin on rest API, via simpleRestClient specifications', () => {
   let request = null;
-  let port = null;
 
   // Bootstrap application in test mode
   beforeAll(async (done) => {
-    port = await getPort();
-    request = await setupTestEnvironment(port);
+    request = await setupTestEnvironment();
     done();
   });
 
   // Drop temp test database
   afterAll(async (done) => {
-    teardownTestEnvironment(port);
+    teardownTestEnvironment();
     done();
   });
 

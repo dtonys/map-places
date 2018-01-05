@@ -12,7 +12,7 @@ import {
 
 
 let _server = null;
-export async function setupTestEnvironment(port) {
+export async function setupTestEnvironment() {
   const expressApp = await createExpressApp(nextMock);
   _server = await startExpressServer(expressApp, global.testPort);
   console.log(`Server ready on http://localhost:${global.testPort}`); // eslint-disable-line no-console
@@ -23,7 +23,7 @@ export async function setupTestEnvironment(port) {
   return request;
 }
 
-export async function teardownTestEnvironment( port ) {
+export async function teardownTestEnvironment() {
   await mongoose.connection.db.dropDatabase();
   mongoose.connection.close();
   _server.close();

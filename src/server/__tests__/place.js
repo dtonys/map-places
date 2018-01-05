@@ -1,4 +1,3 @@
-import getPort from 'get-port';
 import Place from 'models/place';
 import {
   setupTestEnvironment,
@@ -8,18 +7,15 @@ import {
 describe('Place API tests', () => {
 
   let request = null;
-  let port = null;
-
   // Bootstrap application in test mode
   beforeAll(async (done) => {
-    port = await getPort();
-    request = await setupTestEnvironment(port);
+    request = await setupTestEnvironment();
     done();
   });
 
   // Drop temp test database
   afterAll(async (done) => {
-    teardownTestEnvironment(port);
+    teardownTestEnvironment();
     done();
   });
 

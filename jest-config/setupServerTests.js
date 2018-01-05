@@ -3,9 +3,6 @@ import {
   setupMongoose,
   buildAllIndexes,
 } from 'helpers/mongo';
-import {
-  createRequest,
-} from 'web-api/webApiRequest';
 import loadEnv from '../src/server/loadEnv';
 import * as mailer from 'email/mailer';
 
