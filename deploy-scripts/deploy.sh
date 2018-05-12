@@ -2,8 +2,8 @@
 cd ~/webapps/map-places
 git pull origin master
 cd ./admin
-npm i
+yarn
 cd ..
-npm i
+yarn
 npm run build
 npm run start

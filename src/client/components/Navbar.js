@@ -103,6 +103,12 @@ class Navbar extends Component {
                 <button className="button outline secondary">Plot Places</button>
               </a>
             </Link>
+            <div style={{ marginLeft: '10px' }} />
+            <Link route="/admin">
+              <a>
+                <button className="button outline secondary">Admin</button>
+              </a>
+            </Link>
           </div>
         }
 
