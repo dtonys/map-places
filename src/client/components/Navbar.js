@@ -97,9 +97,10 @@ class Navbar extends Component {
                 onClick={this.onLogoutClick}
               >Logout</button>
             </a>
-            <Link route="/users/profile">
+            <div style={{ marginLeft: '10px' }} />
+            <Link route="/admin/plot-places">
               <a>
-                <button className="button outline secondary">Profile</button>
+                <button className="button outline secondary">Plot Places</button>
               </a>
             </Link>
           </div>

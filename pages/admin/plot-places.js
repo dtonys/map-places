@@ -43,7 +43,6 @@ const CONTENT_REGION_WIDTH = 960;
 
 @clientEntry()
 @attachRedux()
-@authenticatedPage({ requiredRoles: [ 'admin' ] })
 @connect(
   (globalState) => ({
     placesLoadedFromStorage: extractPlacesLoadedFromStorage(globalState),

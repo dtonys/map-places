@@ -1,3 +1,10 @@
+import getPort from 'get-port';
+import {
+  setupMongoose,
+  buildAllIndexes,
+} from 'helpers/mongo';
+import loadEnv from 'loadEnv';
+import * as mailer from 'email/mailer';
 import mongoose from 'mongoose';
 import {
   nextMock,
@@ -13,11 +20,17 @@ import {
 
 let _server = null;
 export async function setupTestEnvironment() {
+  const port = await getPort();
+  loadEnv();
+  await setupMongoose(`mapplaces_test_${port}`);
+  await buildAllIndexes();
+  mailer.initialize();
+
   const expressApp = await createExpressApp(nextMock);
-  _server = await startExpressServer(expressApp, global.testPort);
-  console.log(`Server ready on http://localhost:${global.testPort}`); // eslint-disable-line no-console
+  _server = await startExpressServer(expressApp, port);
+  console.log(`Server ready on http://localhost:${port}`); // eslint-disable-line no-console
   const request = createRequest({
-    basePath: `http://localhost:${global.testPort}`,
+    basePath: `http://localhost:${port}`,
     noFollowRedirects: true,
   });
   return request;
