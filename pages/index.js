@@ -105,14 +105,14 @@ class HomePage extends Component {
 
   initializeMap() {
     MapManager.insertMapToDom(document.querySelector('#mapRegion'));
-    tryGetCurrentPosition()
-      .then(({ lat, lng }) => {
-        this.setState({
-          currentPositionLatLng: { lat, lng },
-        });
-        MapManager.googleMap.setCenter({ lat, lng });
-        MapManager.attachMarkerToMap({ lat, lng });
-      });
+    // tryGetCurrentPosition()
+    //   .then(({ lat, lng }) => {
+    //     this.setState({
+    //       currentPositionLatLng: { lat, lng },
+    //     });
+    //     MapManager.googleMap.setCenter({ lat, lng });
+    //     MapManager.attachMarkerToMap({ lat, lng });
+    //   });
   }
 
   loadUserData = () => {
