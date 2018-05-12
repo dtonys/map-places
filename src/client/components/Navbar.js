@@ -78,11 +78,6 @@ class Navbar extends Component {
                 <button className="button outline secondary">Signup</button>
               </a>
             </Link>
-            <Link route="/users/profile">
-              <a>
-                <button className="button outline secondary">Profile</button>
-              </a>
-            </Link>
           </div>
         }
         { userAuthenticated &&
