@@ -11,5 +11,4 @@ module.exports = {
     '**/*.js',
   ],
   verbose: true,
-  setupTestFrameworkScriptFile: '<rootDir>/../../jest-config/setupServerTests.js',
 };
